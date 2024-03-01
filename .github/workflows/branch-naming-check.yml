@@ -1,0 +1,36 @@
+name: Branch Naming Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  check-branch-name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get branch name from PR
+        id: pr_branch
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            return pr.data.head.ref;
+          result-encoding: string
+
+      - name: Check Branch Name
+        run: |
+          branch_name="${{ steps.pr_branch.outputs.result }}"
+          expected_prefix="$(echo $GITHUB_ACTOR | tr '[:upper:]' '[:lower:]')/"
+          actual_prefix="${branch_name%%/*}/"
+          if [[ ! $branch_name =~ ^$expected_prefix ]]; then
+            echo "Branch name: $branch_name"
+            echo "Expected prefix: $expected_prefix"
+            echo "Branch name does not follow the expected naming convention."
+            echo "Actual prefix: $actual_prefix"
+            echo "Expected prefix: $expected_prefix[issue-name]"
+            exit 1
+          fi
