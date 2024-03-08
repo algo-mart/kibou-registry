@@ -1,28 +1,26 @@
 ---
 name: Feature Request
-about: Suggest an idea for this project
+about: Suggest a new feature for this project
 title: '[FEATURE] '
 labels: enhancement
 assignees: ''
 
 ---
 
-### Is your feature request related to a problem? Please describe.
+### Feature Description
 
-<!-- A clear and concise description of what the problem is. Ex. I'm always frustrated when [...] -->
+<!-- A clear and concise description of the feature you're suggesting. -->
 
-### Related Pull Request
+### Problem it Solves
 
-<!-- If this issue is related to an existing pull request, please mention the pull request number here -->
-
-### Describe the solution you'd like
-
-<!-- A clear and concise description of what you want to happen. -->
-
-### Describe alternatives you've considered
-
-<!-- A clear and concise description of any alternative solutions or features you've considered. -->
+<!-- If you have a specific solution in mind, please outline it here. Include any alternative solutions you've considered. -->
 
 ### Additional context
 
 <!-- Add any other context or screenshots about the feature request here. -->
+
+### Acceptance Criteria
+List the criteria that must be met for this feature to be considered complete. For example:
+- [ ] Criteria 1
+- [ ] Criteria 2
+- [ ] Criteria 3
