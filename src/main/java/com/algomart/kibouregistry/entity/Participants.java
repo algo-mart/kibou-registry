@@ -40,7 +40,16 @@ public class Participants {
     @OneToMany(mappedBy = "participantId", cascade = CascadeType.ALL)
     private List<Attendance> attendanceList;
 
-    @OneToMany(mappedBy = "participantId", cascade = CascadeType.ALL)
+    @ManyToMany(cascade = { CascadeType.ALL })
+    @JoinTable(
+            name = "participant_notifications",
+            joinColumns = { @JoinColumn(name = "participant_id") },
+            inverseJoinColumns = { @JoinColumn(name = "notification_id") }
+    )
     private List<Notifications> notificationList;
+
+    @ManyToOne
+    @JoinColumn(name = "event_id")
+    private Events event;
 
 }
