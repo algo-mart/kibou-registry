@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -21,10 +22,6 @@ public class Notifications {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "notification_id")
     private Long notificationId;
-
-    @ManyToOne
-    @JoinColumn(name = "participant_id", nullable = false)
-    private Participants participantId;
 
     @Column(name = "date")
     private Date date;
@@ -39,4 +36,7 @@ public class Notifications {
 
     @Column(name = "notification_content")
     private String notificationContent;
+
+    @ManyToMany(mappedBy = "notificationList")
+    private List<Participants> participantsList;
 }
