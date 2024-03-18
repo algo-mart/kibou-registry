@@ -7,6 +7,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.List;
 
 @Getter
@@ -22,20 +26,33 @@ public class Participants {
     private Long participantId;
 
     @Column(name = "name")
+    @NotBlank(message = "Name is required")
     private String name;
 
     @Column(name = "email")
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
     private String email;
 
     @Column(name = "phone")
-    private String phone;
+    @NotBlank(message = "Phone is required")
+    @Pattern(regexp = "^\\d{11}$", message = "Phone number must be 11 digits")
+    private int phone;
 
     @Column(name = "address")
+    @NotBlank(message = "Address is required")
+    @Size(min = 5, max = 100, message = "Address must be between 5 and 100 characters")
     private String address;
 
     @Enumerated(EnumType.STRING)
+    @NotBlank(message = "Category is required")
     @Column(name = "category")
     private Category category;
+
+    @ManyToOne
+    @JoinColumn(name = "event_id")
+    @NotBlank(message = "Event must be stated")
+    private Events event;
 
     @OneToMany(mappedBy = "participantId", cascade = CascadeType.ALL)
     private List<Attendance> attendanceList;
@@ -47,9 +64,5 @@ public class Participants {
             inverseJoinColumns = { @JoinColumn(name = "notification_id") }
     )
     private List<Notifications> notificationList;
-
-    @ManyToOne
-    @JoinColumn(name = "event_id")
-    private Events event;
 
 }
