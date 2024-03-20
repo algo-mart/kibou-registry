@@ -19,6 +19,7 @@
         <sonar.organization>algo-mart</sonar.organization>
         <sonar.host.url>https://sonarcloud.io</sonar.host.url>
     </properties>
+    <packaging>jar</packaging>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -86,6 +87,7 @@
                 </configuration>
             </plugin>
         </plugins>
+        <finalName>kibou-registry</finalName>
     </build>
     <repositories>
         <repository>
