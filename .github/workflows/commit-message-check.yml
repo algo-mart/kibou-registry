@@ -9,22 +9,21 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v2
 
-      - name: Check if Merge Commit
-        id: check-merge
-        run: |
-          is_merge_commit=$(git log -1 --pretty=%P | wc -w)
-          echo "is_merge_commit=$is_merge_commit" >> $GITHUB_ENV
-          echo "::set-output name=is_merge::$(if [ "$is_merge_commit" -gt 1 ]; then echo 'true'; else echo 'false'; fi)"
-
       - name: Check Commit Message
-        if: env.is_merge_commit == '1'
+        id: check-commit
+        run: |
+          commit_message=$(git log -1 --pretty=%B)
+          echo "::set-output name=message::$commit_message"
+
+      - name: Check Commit Message Format
+        if: "!startsWith(steps.check-commit.outputs.message, 'Merge')"
         uses: gsactions/commit-message-checker@v1
         with:
           pattern: '^(feat|chore|test|fix|perf|doc|refactor):'
           error: 'Commit message does not start with "feat:", "chore:", "test:", "fix:", "perf:", "doc:", or "refactor"'
 
       - name: Check Commit Message Length
-        if: env.is_merge_commit == '1'
+        if: "!startsWith(steps.check-commit.outputs.message, 'Merge')"
         run: |
           commit_message=$(git log -1 --pretty=%B)
           min_length=15
