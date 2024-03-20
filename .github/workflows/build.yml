@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - develop
+      - main
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -11,14 +12,16 @@ jobs:
     name: Build and analyze
     runs-on: ubuntu-latest
     env:
-      ENVIRONMENT: ${{ github.ref == 'refs/heads/main' ? 'prod' : 'dev' }}
+      POSTGRES_USER: ${{ github.ref == 'refs/heads/main' && secrets.PROD_POSTGRES_USER || secrets.DEV_POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ github.ref == 'refs/heads/main' && secrets.PROD_POSTGRES_PASSWORD || secrets.DEV_POSTGRES_PASSWORD }}
+      POSTGRES_DB: ${{ github.ref == 'refs/heads/main' && secrets.PROD_POSTGRES_DB || secrets.DEV_POSTGRES_DB }}
     services:
       postgres:
         image: postgres
         env:
-          POSTGRES_DB: ${{ secrets[env.ENVIRONMENT + '_POSTGRES_DB'] }}
-          POSTGRES_USER: ${{ secrets[env.ENVIRONMENT + '_POSTGRES_USER'] }}
-          POSTGRES_PASSWORD: ${{ secrets[env.ENVIRONMENT + '_POSTGRES_PASSWORD'] }}
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
         ports:
           - 5432:5432
         options: >-
@@ -29,12 +32,12 @@ jobs:
     steps:
       - uses: actions/checkout@v3
         with:
-          fetch-depth: 0
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: 17
-          distribution: 'zulu'
+          distribution: 'zulu' # Alternative distribution options are available.
       - name: Cache SonarCloud packages
         uses: actions/cache@v3
         with:
@@ -47,8 +50,8 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build and analyze
+      - name: Build and analyze with SonarCloud
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=algo-mart_kibou-registry
