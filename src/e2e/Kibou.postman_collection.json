@@ -1,0 +1,616 @@
+{
+	"info": {
+		"_postman_id": "2becbab0-eaa9-4024-ab46-c1fa219fce11",
+		"name": "Kibou",
+		"description": "Here's a detailed explanation of the Kibou Registry application, designed for both backend and frontend developers to understand the purpose and functionality of the system:\n\n# 📄 Kibou Registry Application Documentation\n\n## Introduction\n\nThe Kibou Registry is a comprehensive NGO Participant Management System designed to streamline the management of participant data, track attendance, manage daily financial disbursements, and facilitate communication through automated notifications. This document provides an overview of the system, its key features, and the architecture of the backend and frontend components.\n\n## System Overview\n\nThe Kibou Registry aims to provide an efficient and user-friendly platform for NGOs to manage their participants, including interns, members, and senior staff. The system is divided into several key modules:\n\n1. **Participant Management:** Allows administrators to add, update, and manage participant records, including their name, category, and contact information.\n    \n2. **Attendance Tracking:** Enables recording of attendance for each meeting day, allowing admins to keep track of participant presence.\n    \n3. **Financial Management:** Facilitates the entry and management of daily financial disbursements to participants, ensuring accurate financial records.\n    \n4. **Automated Notifications:** Sends automated email or SMS notifications to participants to notify them of their attendance status and other important updates.\n    \n5. **Monthly Summary Reports:** Generates reports showing total attendance and payments for each category, providing a quick assessment of monthly activities.\n    \n\n## Backend Development\n\nThe backend of the Kibou Registry is responsible for handling the business logic, database interactions, and API endpoints for the system. Key components include:\n\n- **Database Setup:** The system uses a relational database to store participant, attendance, payment, and notification records. The database schema is based on the Entity-Relationship Diagram (ERD) provided in the Kibou Registry document.\n    \n- **API Endpoints:** RESTful API endpoints are implemented for CRUD operations on participants, recording attendance, managing daily payments, and sending notifications. These endpoints are secured and accessible only to authorized users.\n    \n- **Business Logic:** The backend includes logic for processing daily payments, generating monthly summary reports, and triggering automated notifications based on attendance records.\n    \n- **Integration with External Services:** The system integrates with email and SMS service providers for sending notifications.\n    \n- **Security:** Authentication and authorization mechanisms are in place to secure API endpoints and protect sensitive data.\n    \n\n## Frontend Development\n\nThe frontend of the Kibou Registry provides a user-friendly interface for administrators to interact with the system. Key features include:\n\n- **Admin Dashboard:** A central hub for accessing all features, including quick links to add participants, record attendance, enter daily payments, and view monthly summaries.\n    \n- **Participant Entry Form:** Allows for the entry of new participant details, with fields for name, category, and contact information.\n    \n- **Attendance Recording Page:** Displays a list of participants with checkboxes for marking attendance.\n    \n- **Daily Payments Entry Form:** Provides a form to enter the total amount paid for the day, with validation and confirmation of payment information.\n    \n- **Monthly Summary Reports Page:** Shows reports on total attendance and payments for each category for each day of the week.\n    \n- **Automated Notifications Setup:** Enables configuration of automated emails and SMS for absentees and attendees, with access to setup and logs review through the Admin Dashboard.\n    \n\n## Conclusion\n\nThe Kibou Registry is a vital tool for NGOs to efficiently manage their participants, track attendance, handle financial disbursements, and communicate effectively through automated notifications. This documentation provides a clear overview of the system's features and architecture, enabling both backend and frontend developers to understand and contribute to the development of the Kibou Registry application.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33534394",
+		"_collection_link": "https://algomart.postman.co/workspace/algomart-Workspace~d3942c8c-a548-4277-81b9-70ae1c2c5805/collection/33534394-2becbab0-eaa9-4024-ab46-c1fa219fce11?action=share&source=collection_link&creator=33534394"
+	},
+	"item": [
+		{
+			"name": "Participants",
+			"item": [
+				{
+					"name": "Create a participant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe\",\n  \"category\": \"Intern\",\n  \"contact_info\": {\n    \"email\": \"johndoe@example.com\",\n    \"phone\": \"1234567890\",\n    \"address\": \"123 Main St\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseurl}}/partcipants",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"partcipants"
+							]
+						},
+						"description": "Create a new participant."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"John Doe\",\n  \"category\": \"Intern\",\n  \"contact_info\": {\n    \"email\": \"johndoe@example.com\",\n    \"phone\": \"1234567890\",\n    \"address\": \"123 Main St\"\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/participants",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"participants"
+									],
+									"query": [
+										{
+											"key": "workspace",
+											"value": "1f0df51a-8658-4ee8-a2a1-d2567dfa09a9",
+											"description": "Optional. A workspace ID in which to create the collection.\n\nIf you do not include this query parameter, the system creates the collection in your \"My Workspace\" workspace.",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "Created",
+							"code": 201,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"name": "Content-Type",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"status\": \"success\",\n  \"message\": \"Participant created successfully\",\n  \"data\": {\n    \"participantId\": 1\n  }\n}\n\n"
+						},
+						{
+							"name": "Bad Request",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"category\": \"Intern\",\n  \"contact_info\": {\n    \"email\": \"invalidemail\",\n    \"phone\": \"1234567890\",\n    \"address\": \"123 Main St\"\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/participants",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"participants"
+									],
+									"query": [
+										{
+											"key": "workspace",
+											"value": "1f0df51a-8658-4ee8-a2a1-d2567dfa09a9",
+											"description": "Optional. A workspace ID in which to create the collection.\n\nIf you do not include this query parameter, the system creates the collection in your \"My Workspace\" workspace.",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "Bad Request",
+							"code": 400,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"name": "Content-Type",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"status\": \"failed\",\n  \"error\": \"invalid email, name canot be empty\",\n  \"message\": \"please enter a valid request\"\n}"
+						},
+						{
+							"name": "Internal Server Error",
+							"originalRequest": {
+								"method": "POST",
+								"header": [
+									{
+										"key": "Content-Type",
+										"name": "Content-Type",
+										"value": "application/json",
+										"type": "text"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"collection\": {\n        \"item\": [\n            {\n                \"name\": \"Test GET Response\",\n                \"event\": [\n                    {\n                        \"listen\": \"test\",\n                        \"script\": {\n                            \"id\": \"7d2334fc-a84a-4c3d-b26c-7529afa4c0ae\",\n                            \"exec\": [\n                                \"pm.test(\\\"Status code is 200\\\", function () {\",\n                                \"    pm.response.to.have.status(200);\",\n                                \"});\"\n                                ],\n                            \"type\": \"text/javascript\"\n                            }\n                        }\n                    ],\n                \"request\": {\n                    \"url\": \"https://echo.getpostman.com/headers\",\n                    \"method\": \"GET\",\n                    \"header\": [\n                        {\n                            \"key\": \"Content-Type\",\n                            \"value\": \"application/json\"\n                        }\n                    ]\n                }\n            }\n        ]\n    }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/participants",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"participants"
+									],
+									"query": [
+										{
+											"key": "workspace",
+											"value": "1f0df51a-8658-4ee8-a2a1-d2567dfa09a9",
+											"description": "Optional. A workspace ID in which to create the collection.\n\nIf you do not include this query parameter, the system creates the collection in your \"My Workspace\" workspace.",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "Internal Server Error",
+							"code": 500,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json; charset=utf-8"
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"status\": \"failed\",\n  \"error\": \"internal server error\",\n  \"message\": \"network unavailable, please try again\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Get a participant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/participants/:id",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"participants",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Retrieve details of a specific participant."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl}}/participants/:id",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"participants",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"name": "Content-Type",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"status\": \"success\",\n  \"message\": \"Participant retrieved successfully\",\n  \"data\": {\n      \"participantId\": 1,\n      \"name\": \"John Doe\",\n      \"category\": \"Intern\",\n      \"contactInfo\": {\n        \"email\": \"johndoe@example.com\",\n        \"phone\": \"1234567890\",\n        \"address\": \"123 Main St\"\n      }\n  }\n}\n"
+						},
+						{
+							"name": "Not Found",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl}}/participants/:id",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"participants",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"status": "Not Found",
+							"code": 404,
+							"_postman_previewlanguage": "json",
+							"header": [],
+							"cookie": [],
+							"body": "{\n  \"status\": \"failed\",\n  \"error\": \"not found\",\n  \"message\": \"participant not found\"\n}"
+						}
+					]
+				},
+				{
+					"name": "Delete a participant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/participants/:id",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"participants",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Deletes a participant."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"originalRequest": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl}}/partcipants/:id",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"partcipants",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "1"
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"status\": \"success\",\n  \"message\": \"Participant deleted successfully\",\n  \"data\": {\n    \"participantId\": 1\n  }\n}"
+						}
+					]
+				},
+				{
+					"name": "Update a participant",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"John Doe Updated\",\n  \"category\": \"Senior Staff\",\n  \"contactInfo\": {\n    \"email\": \"johndoeupdated@example.com\",\n    \"phone\": \"1234567890\",\n    \"address\": \"123 Main St\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{baseurl}}/participants/:id",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"participants",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						},
+						"description": "Retrieve a list of all participants."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"originalRequest": {
+								"method": "PUT",
+								"header": [
+									{
+										"key": "Content-Type",
+										"value": "application/json"
+									}
+								],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"name\": \"John Doe Updated\",\n  \"category\": \"Senior Staff\",\n  \"contactInfo\": {\n    \"email\": \"johndoeupdated@example.com\",\n    \"phone\": \"1234567890\",\n    \"address\": \"123 Main St\"\n  }\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseurl}}/partcipants/:id",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"partcipants",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"name": "Content-Type",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"status\": \"success\",\n  \"message\": \"Participant deleted successfully\",\n   \"data\": {\n    \"participantId\": 1,\n    \"name\": \"John Doe\",\n    \"category\": \"Senior Staff\",\n    \"contactInfo\": {\n      \"email\": \"johndoe@example.com\",\n      \"phone\": \"1234567890\",\n      \"address\": \"123 Main St\"\n        }\n    }\n}"
+						}
+					]
+				},
+				{
+					"name": "Get all participants",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									""
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseurl}}/participants",
+							"host": [
+								"{{baseurl}}"
+							],
+							"path": [
+								"participants"
+							]
+						},
+						"description": "Gets all of your [collections](https://www.getpostman.com/docs/collections). The response includes all of your subscribed collections."
+					},
+					"response": [
+						{
+							"name": "Successful Response",
+							"originalRequest": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseurl}}/partcipants",
+									"host": [
+										"{{baseurl}}"
+									],
+									"path": [
+										"partcipants"
+									],
+									"query": [
+										{
+											"key": "workspace",
+											"value": "1f0df51a-8658-4ee8-a2a1-d2567dfa09a9",
+											"description": "Optional. A workspace ID.",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"status": "OK",
+							"code": 200,
+							"_postman_previewlanguage": "json",
+							"header": [
+								{
+									"key": "Content-Type",
+									"value": "application/json",
+									"description": {
+										"content": "",
+										"type": "text/plain"
+									}
+								}
+							],
+							"cookie": [],
+							"body": "{\n  \"status\": \"success\",\n  \"message\": \"Participants retrieved successfully\",\n  \"data\": [\n    {\n      \"participantId\": 1,\n      \"name\": \"John Doe\",\n      \"category\": \"Intern\",\n      \"contactInfo\": {\n        \"email\": \"johndoe@example.com\",\n        \"phone\": \"1234567890\",\n        \"address\": \"123 Main St\"\n      }\n    },\n    {\n      \"participantId\": 2,\n      \"name\": \"Jane Doe\",\n      \"category\": \"Member\",\n      \"contactInfo\": {\n        \"email\": \"janedoe@example.com\",\n        \"phone\": \"0987654321\",\n        \"address\": \"456 Elm St\"\n      }\n    }\n  ]\n}\n"
+						}
+					]
+				}
+			],
+			"description": "The Participant collection is responsible for managing participant records in the Kibou Registry system. The following API endpoints are available for interacting with this collection:"
+		},
+		{
+			"name": "Attendances",
+			"item": [
+				{
+					"name": "Create Participants",
+					"request": {
+						"method": "POST",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseurl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}
