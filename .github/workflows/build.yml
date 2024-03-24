@@ -3,6 +3,7 @@ on:
   push:
     branches:
       - develop
+      - main
   pull_request:
     types: [opened, synchronize, reopened]
 
@@ -10,6 +11,24 @@ jobs:
   build:
     name: Build and analyze
     runs-on: ubuntu-latest
+    env:
+      POSTGRES_USER: ${{ github.ref == 'refs/heads/main' && secrets.PROD_POSTGRES_USER || secrets.DEV_POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ github.ref == 'refs/heads/main' && secrets.PROD_POSTGRES_PASSWORD || secrets.DEV_POSTGRES_PASSWORD }}
+      POSTGRES_DB: ${{ github.ref == 'refs/heads/main' && secrets.PROD_POSTGRES_DB || secrets.DEV_POSTGRES_DB }}
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: ${{ env.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ env.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ env.POSTGRES_DB }}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v3
         with:
@@ -31,7 +50,7 @@ jobs:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build and analyze
+      - name: Build and analyze with SonarCloud
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}

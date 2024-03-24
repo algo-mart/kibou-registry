@@ -1,33 +1,26 @@
-version: '3'
+version: '3.8'
 
 services:
-  app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    depends_on:
-      - db
+  kibou:
+    image: kibou-registery
+    build: .
     ports:
-      - "8081:8080"
+      - "8000-8999:8080"
     environment:
-      SPRING_DATASOURCE_URL: "jdbc:postgresql://db:5432/kibou-registry"
-      SPRING_DATASOURCE_USERNAME: "postgres"
-      SPRING_DATASOURCE_PASSWORD: "1234"
-    networks:
-      - app-network
-    volumes:
-      - ./target:/app
-
+      POSTGRES_HOST: db
+      POSTGRES_PASSWORD: 12344567
+      POSTGRES_USER: postgres
+      POSTGRES_PORT: 5432
   db:
     image: postgres:latest
     environment:
-      POSTGRES_DB: kibou-registry
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: 1234
+      POSTGRES_DB: kibou_db
+      POSTGRES_PASSWORD: 12344567
     ports:
-      - "5432:5432"
-    networks:
-      - app-network
+      - "5436:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
-networks:
-  app-network:
+
+volumes:
+  postgres_data:
