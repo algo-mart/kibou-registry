@@ -6,8 +6,10 @@ import com.algomart.kibouregistry.entity.Participants;
 import com.algomart.kibouregistry.enums.Category;
 import com.algomart.kibouregistry.response.APIResponse;
 import com.algomart.kibouregistry.services.implementations.ParticipantsServiceImpl;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
@@ -27,7 +29,13 @@ public class ParticipantsServiceImplTest {
     @Mock
     private ParticipantsRepo participantsRepo;
 
+    @InjectMocks
     private ParticipantsServiceImpl participantsService;
+
+    @BeforeEach
+    public void setup() {
+
+    }
 
     @Test
     public void testAddParticipant_WithValidParticipant_ShouldReturnSuccessResponse() {
