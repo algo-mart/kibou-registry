@@ -1,6 +1,6 @@
 package com.algomart.kibouregistry.entity;
 
-import com.sample.kiboursample.enums.EventType;
+import com.algomart.kibouregistry.enums.EventType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
