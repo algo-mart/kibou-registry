@@ -1,10 +1,18 @@
 package com.algomart.kibouregistry.entity;
-import com.algomart.kibouregistry.enums.EventType;
+
+import com.sample.kiboursample.enums.EventType;
 import jakarta.persistence.*;
-import lombok.*;
-import java.util.Date;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+import java.time.LocalDate;
 import java.util.List;
-@Data
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "events")
 public class Events {
@@ -14,7 +22,7 @@ public class Events {
     private Long eventId;
 
     @Column(name = "date")
-    private Date date;
+    private LocalDate date;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "event_type")
