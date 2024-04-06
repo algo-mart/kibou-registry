@@ -3,16 +3,13 @@ package com.algomart.kibouregistry;
 import com.algomart.kibouregistry.dao.ParticipantsRepo;
 import com.algomart.kibouregistry.entity.ContactInfo;
 import com.algomart.kibouregistry.entity.Participants;
-import com.algomart.kibouregistry.enums.Category;
 import com.algomart.kibouregistry.response.APIResponse;
 import com.algomart.kibouregistry.services.implementations.ParticipantsServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -25,7 +22,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
-@ExtendWith(MockitoExtension.class)
 public class ParticipantsServiceImplTest {
 
     @Mock
@@ -43,6 +39,8 @@ public class ParticipantsServiceImplTest {
     public void testAddParticipant_WithValidParticipant_ShouldReturnSuccessResponse() {
         // Arrange
         Participants participant = new Participants();
+        participant.setName("John Doe");
+        participant.setContactInfo(new ContactInfo(1L, "john@example.com", "1234567890", "123 Main St"));
         when(participantsRepo.findByContactInfoEmail(any(String.class))).thenReturn(null);
         when(participantsRepo.save(any(Participants.class))).thenReturn(participant);
 
@@ -52,6 +50,7 @@ public class ParticipantsServiceImplTest {
         // Assert
         assertEquals("Success", response.getStatus());
         assertEquals("Participant created successfully", response.getMessage());
+        assertEquals(participant.getParticipantId(), response.getData());
         verify(participantsRepo, times(1)).findByContactInfoEmail(any(String.class));
         verify(participantsRepo, times(1)).save(any(Participants.class));
     }
@@ -93,6 +92,7 @@ public class ParticipantsServiceImplTest {
         assertEquals("Success", response.getStatus());
         assertEquals("Participant retrieved successfully", response.getMessage());
         assertEquals(participant, response.getData());
+        verify(participantsRepo, times(1)).findById(id);
     }
 
     // Test other cases for testGetParticipantById method (invalid id, participant not found, etc.)
@@ -113,6 +113,8 @@ public class ParticipantsServiceImplTest {
         assertEquals("Success", response.getStatus());
         assertEquals("Participant updated successfully", response.getMessage());
         assertEquals(participant, response.getData());
+        verify(participantsRepo, times(1)).existsById(id);
+        verify(participantsRepo, times(1)).save(any(Participants.class));
     }
 
     // Test other cases for testUpdateParticipant method (invalid id, participant not found, etc.)
@@ -132,14 +134,4 @@ public class ParticipantsServiceImplTest {
         verify(participantsRepo, times(1)).deleteById(id);
     }
 
-    private Participants createDummyParticipant() {
-        Participants participant = new Participants();
-        participant.setParticipantId(1L);
-        participant.setName("John Doe");
-        participant.setCategory(Category.valueOf("Category"));
-        participant.setContactInfo(new ContactInfo(1L, "john@example.com", "1234567890", "123 Main St"));
-        return participant;
-    }
-
-    // Test other cases for testDeleteParticipant method (invalid id, participant not found, etc.)
 }
