@@ -58,5 +58,4 @@ public class Participants {
     public Participants(Long participantId) {
         this.participantId = participantId;
     }
-
 }
