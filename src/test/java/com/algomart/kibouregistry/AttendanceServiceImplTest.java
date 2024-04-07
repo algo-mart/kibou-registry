@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,14 +100,19 @@ public class AttendanceServiceImplTest {
     public void testUpdateAttendance_WithValidIdAndAttendance_ShouldReturnSuccessResponse() {
         // Arrange
         Long id = 1L;
-        Attendance existingAttendance = new Attendance(); // Create an existing attendance object
-        existingAttendance.setAttendanceId(id);
 
-        Attendance updatedAttendance = new Attendance(); // Create an updated attendance object
-        updatedAttendance.setAttendanceId(id);
+        // Create LocalDate object for date
+        LocalDate date = LocalDate.of(2024, 4, 6);
 
+        // Create existing attendance with ID, participant ID, date, and status
+        Attendance existingAttendance = new Attendance(id, new Participants(1L), date, AttendanceStatus.PRESENT);
+
+        // Create updated attendance with the same details
+        Attendance updatedAttendance = new Attendance(id, new Participants(1L), date, AttendanceStatus.PRESENT);
+
+        // Mock behavior of attendanceRepo
         when(attendanceRepo.findById(id)).thenReturn(Optional.of(existingAttendance));
-        when(attendanceRepo.save(any(Attendance.class))).thenAnswer(invocation -> invocation.getArgument(0)); // Return the saved attendance object
+        when(attendanceRepo.save(any(Attendance.class))).thenReturn(updatedAttendance);
 
         // Act
         APIResponse response = attendanceService.updateAttendance(id, updatedAttendance);
@@ -154,7 +160,10 @@ public class AttendanceServiceImplTest {
     @Test
     public void testGetAttendanceByParticipantId_WithInvalidParticipantId_ShouldReturnFailedResponse() {
         // Arrange
-        Participants invalidParticipant = new Participants(); // Create an invalid participant without an ID
+        Long invalidParticipantId = 999L; // Assuming this ID does not exist
+        Participants invalidParticipant = new Participants(invalidParticipantId);
+
+        when(attendanceRepo.findByParticipantId(invalidParticipant)).thenReturn(Collections.emptyList());
 
         // Act
         APIResponse response = attendanceService.getAttendanceByParticipantId(invalidParticipant);
