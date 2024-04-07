@@ -101,27 +101,19 @@ public class AttendanceServiceImplTest {
     @Test
     public void testUpdateAttendance_WithValidIdAndAttendance_ShouldReturnSuccessResponse() {
         // Arrange
-        long id = 1L;
-        Attendance existingAttendance = new Attendance();
-        existingAttendance.setAttendanceId(id);
-        existingAttendance.setDate(LocalDate.now().minusDays(1)); // Some existing date
-        existingAttendance.setStatus(AttendanceStatus.PRESENT); // Some existing status
+        long validAttendanceId = 1L; // Assuming this ID exists
+        Attendance existingAttendance = new Attendance(); // Assuming some existing attendance object
+        Attendance updatedAttendance = new Attendance(); // Assuming some updated attendance object
 
-        Attendance updatedAttendance = new Attendance();
-        updatedAttendance.setAttendanceId(id);
-        updatedAttendance.setDate(LocalDate.now()); // Updated date
-        updatedAttendance.setStatus(AttendanceStatus.ABSENT); // Updated status
-
-        when(attendanceRepo.findById(id)).thenReturn(Optional.of(existingAttendance));
+        when(attendanceRepo.findById(validAttendanceId)).thenReturn(Optional.of(existingAttendance));
         when(attendanceRepo.save(any(Attendance.class))).thenReturn(updatedAttendance);
 
         // Act
-        APIResponse response = attendanceService.updateAttendance(id, updatedAttendance);
+        APIResponse response = attendanceService.updateAttendance(validAttendanceId, updatedAttendance);
 
         // Assert
         assertEquals("Success", response.getStatus());
         assertEquals("Attendance record updated successfully", response.getMessage());
-        assertNotNull(response.getData());
         assertEquals(updatedAttendance, response.getData());
     }
 
@@ -143,32 +135,23 @@ public class AttendanceServiceImplTest {
         // Assert
         assertEquals("Failed", response.getStatus());
         assertEquals("Attendance does not exist", response.getMessage());
-        assertEquals(null, response.getData());
+        assertNull(response.getData());
     }
     @Test
     public void testUpdateAttendance_WithException_ShouldReturnFailedResponse() {
         // Arrange
-        long id = 1L;
-        Attendance existingAttendance = new Attendance();
-        existingAttendance.setAttendanceId(id);
-        existingAttendance.setDate(LocalDate.now().minusDays(1)); // Some existing date
-        existingAttendance.setStatus(AttendanceStatus.PRESENT); // Some existing status
+        long invalidAttendanceId = 999L; // Assuming this ID does not exist
+        Attendance updatedAttendance = new Attendance(); // Assuming some updated attendance object
 
-        Attendance updatedAttendance = new Attendance();
-        updatedAttendance.setAttendanceId(id);
-        updatedAttendance.setDate(LocalDate.now()); // Updated date
-        updatedAttendance.setStatus(AttendanceStatus.ABSENT); // Updated status
-
-        when(attendanceRepo.findById(id)).thenReturn(Optional.of(existingAttendance));
-        when(attendanceRepo.save(any(Attendance.class))).thenThrow(ResourceNotFoundException.class);
+        when(attendanceRepo.findById(invalidAttendanceId)).thenReturn(Optional.empty());
 
         // Act
-        APIResponse response = attendanceService.updateAttendance(id, updatedAttendance);
+        APIResponse response = attendanceService.updateAttendance(invalidAttendanceId, updatedAttendance);
 
         // Assert
         assertEquals("Failed", response.getStatus());
-        assertEquals("Error updating attendance record", response.getMessage());
-        assertEquals(null, response.getData());
+        assertEquals("Error updating attendance record: Attendance record with ID 999 not found", response.getMessage());
+        assertNull(response.getData());
     }
 
     @Test
@@ -192,9 +175,8 @@ public class AttendanceServiceImplTest {
     @Test
     public void testGetAttendanceByParticipantId_WithInvalidParticipantId_ShouldReturnFailedResponse() {
         // Arrange
-        long invalidParticipantId = 999L; // Assuming this ID does not exist
-        Participants invalidParticipant = new Participants(invalidParticipantId); // Creating a participant object with the invalid ID
-        when(attendanceRepo.findByParticipantId(eq(invalidParticipant)))
+        Participants invalidParticipant = new Participants(999L);;
+        when(attendanceRepo.findByParticipantId(invalidParticipant))
                 .thenReturn(Collections.emptyList()); // Simulate no attendance records found
 
         // Act
