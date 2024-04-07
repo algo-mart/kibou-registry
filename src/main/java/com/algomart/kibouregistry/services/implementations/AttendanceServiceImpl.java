@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -71,7 +72,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                     .message("Attendance records retrieved successfully")
                     .data(attendancePage.getContent())
                     .build();
-        } catch (Exception e) {
+        } catch (ResourceNotFoundException e) {
             // Handle any exceptions and return failure response
             return APIResponse.builder()
                     .status("Failed")
@@ -100,23 +101,36 @@ public class AttendanceServiceImpl implements AttendanceService {
     @Override
     public APIResponse updateAttendance(Long id, Attendance attendance) {
         try {
-            Attendance existingAttendance = attendanceRepo.findById(id)
-                    .orElseThrow(ResourceNotFoundException::new);
+            Optional<Attendance> optionalAttendance = attendanceRepo.findById(id);
 
-            existingAttendance.setDate(attendance.getDate());
-            existingAttendance.setStatus(attendance.getStatus());
+            // Check if the attendance record exists
+            if (optionalAttendance.isPresent()) {
+                Attendance existingAttendance = optionalAttendance.get();
 
-            attendanceRepo.save(existingAttendance);
+                // Update the existing attendance record
+                existingAttendance.setDate(attendance.getDate());
+                existingAttendance.setStatus(attendance.getStatus());
 
-            return APIResponse.builder()
-                    .status("Success")
-                    .message("Attendance record updated successfully")
-                    .data(existingAttendance)
-                    .build();
+                // Save the updated attendance record
+                attendanceRepo.save(existingAttendance);
+
+                return APIResponse.builder()
+                        .status("Success")
+                        .message("Attendance record updated successfully")
+                        .data(existingAttendance)
+                        .build();
+            } else {
+                // Attendance record with the given ID was not found
+                return APIResponse.builder()
+                        .status("Failed")
+                        .message("Attendance does not exist")
+                        .build();
+            }
         } catch (ResourceNotFoundException ex) {
+            // Handle other potential exceptions
             return APIResponse.builder()
                     .status("Failed")
-                    .message("Attendance does not exist")
+                    .message("Error updating attendance record: " + ex.getMessage())
                     .build();
         }
     }
