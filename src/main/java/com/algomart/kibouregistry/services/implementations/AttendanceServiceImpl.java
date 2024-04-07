@@ -83,17 +83,18 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public APIResponse getAttendanceByParticipantId(Participants participantId) {
-        try {
-            List<Attendance> attendanceList = attendanceRepo.findByParticipantId(participantId);
+        List<Attendance> attendanceList = attendanceRepo.findByParticipantId(participantId);
+
+        if (attendanceList.isEmpty()) {
+            return APIResponse.builder()
+                    .status("Failed")
+                    .message("Attendance does not exist")
+                    .build();
+        } else {
             return APIResponse.builder()
                     .status("Success")
                     .message("Attendance records retrieved successfully")
                     .data(attendanceList)
-                    .build();
-        } catch (ResourceNotFoundException ex) {
-            return APIResponse.builder()
-                    .status("Failed")
-                    .message("Attendance does not exist")
                     .build();
         }
     }
