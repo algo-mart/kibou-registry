@@ -100,17 +100,9 @@ public class AttendanceServiceImplTest {
     public void testUpdateAttendance_WithValidIdAndAttendance_ShouldReturnSuccessResponse() {
         // Arrange
         Long id = 1L;
+        Attendance existingAttendance = new Attendance(1L, new Participants(1L), LocalDate.of(2024, 4, 6), AttendanceStatus.PRESENT);
+        Attendance updatedAttendance = new Attendance(1L, new Participants(1L), LocalDate.of(2024, 4, 6), AttendanceStatus.PRESENT);
 
-        // Create LocalDate object for date
-        LocalDate date = LocalDate.of(2024, 4, 6);
-
-        // Create existing attendance with ID, participant ID, date, and status
-        Attendance existingAttendance = new Attendance(id, new Participants(1L), date, AttendanceStatus.PRESENT);
-
-        // Create updated attendance with the same details
-        Attendance updatedAttendance = new Attendance(id, new Participants(1L), date, AttendanceStatus.PRESENT);
-
-        // Mock behavior of attendanceRepo
         when(attendanceRepo.findById(id)).thenReturn(Optional.of(existingAttendance));
         when(attendanceRepo.save(any(Attendance.class))).thenReturn(updatedAttendance);
 
@@ -120,12 +112,7 @@ public class AttendanceServiceImplTest {
         // Assert
         assertEquals("Success", response.getStatus());
         assertEquals("Attendance record updated successfully", response.getMessage());
-
-        // Ensure that the expected and actual Attendance objects match based on their attributes
-        assertEquals(updatedAttendance.getAttendanceId(), ((Attendance)response.getData()).getAttendanceId());
-        assertEquals(updatedAttendance.getParticipantId(), ((Attendance)response.getData()).getParticipantId());
-        assertEquals(updatedAttendance.getDate(), ((Attendance)response.getData()).getDate());
-        assertEquals(updatedAttendance.getStatus(), ((Attendance)response.getData()).getStatus());
+        assertEquals(updatedAttendance, response.getData());
     }
 
     @Test
@@ -165,14 +152,13 @@ public class AttendanceServiceImplTest {
     @Test
     public void testGetAttendanceByParticipantId_WithInvalidParticipantId_ShouldReturnFailedResponse() {
         // Arrange
-        Long invalidParticipantId = 100L; // Assuming participant ID 100 is invalid
-        Participants invalidParticipant = new Participants(invalidParticipantId);
+        Long invalidParticipantId = 999L; // Assuming this participant ID does not exist in the database
 
-        // Mock behavior of attendanceRepo
-        when(attendanceRepo.findByParticipantId(invalidParticipant)).thenReturn(Collections.emptyList());
+        // Mock behavior of attendanceRepo to return an empty list when findByParticipantId is called with the invalid participant ID
+        when(attendanceRepo.findByParticipantId(any())).thenReturn(Collections.emptyList());
 
         // Act
-        APIResponse response = attendanceService.getAttendanceByParticipantId(invalidParticipant);
+        APIResponse response = attendanceService.getAttendanceByParticipantId(new Participants(invalidParticipantId));
 
         // Assert
         assertEquals("Failed", response.getStatus());
