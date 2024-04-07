@@ -120,7 +120,12 @@ public class AttendanceServiceImplTest {
         // Assert
         assertEquals("Success", response.getStatus());
         assertEquals("Attendance record updated successfully", response.getMessage());
-        assertEquals(updatedAttendance, response.getData());
+
+        // Ensure that the expected and actual Attendance objects match based on their attributes
+        assertEquals(updatedAttendance.getAttendanceId(), ((Attendance)response.getData()).getAttendanceId());
+        assertEquals(updatedAttendance.getParticipantId(), ((Attendance)response.getData()).getParticipantId());
+        assertEquals(updatedAttendance.getDate(), ((Attendance)response.getData()).getDate());
+        assertEquals(updatedAttendance.getStatus(), ((Attendance)response.getData()).getStatus());
     }
 
     @Test
@@ -160,9 +165,10 @@ public class AttendanceServiceImplTest {
     @Test
     public void testGetAttendanceByParticipantId_WithInvalidParticipantId_ShouldReturnFailedResponse() {
         // Arrange
-        Long invalidParticipantId = 999L; // Assuming this ID does not exist
+        Long invalidParticipantId = 100L; // Assuming participant ID 100 is invalid
         Participants invalidParticipant = new Participants(invalidParticipantId);
 
+        // Mock behavior of attendanceRepo
         when(attendanceRepo.findByParticipantId(invalidParticipant)).thenReturn(Collections.emptyList());
 
         // Act
