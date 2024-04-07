@@ -5,6 +5,7 @@ import com.algomart.kibouregistry.dao.ParticipantsRepo;
 import com.algomart.kibouregistry.entity.Attendance;
 import com.algomart.kibouregistry.entity.Participants;
 import com.algomart.kibouregistry.enums.AttendanceStatus;
+import com.algomart.kibouregistry.exceptions.ResourceNotFoundException;
 import com.algomart.kibouregistry.response.APIResponse;
 import com.algomart.kibouregistry.services.implementations.AttendanceServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
@@ -96,12 +97,20 @@ public class AttendanceServiceImplTest {
         verify(attendanceRepo, times(1)).findAll(any(Pageable.class));
     }
 
+
     @Test
     public void testUpdateAttendance_WithValidIdAndAttendance_ShouldReturnSuccessResponse() {
         // Arrange
-        Long id = 1L;
-        Attendance existingAttendance = new Attendance(1L, new Participants(1L), LocalDate.of(2024, 4, 6), AttendanceStatus.PRESENT);
-        Attendance updatedAttendance = new Attendance(1L, new Participants(1L), LocalDate.of(2024, 4, 6), AttendanceStatus.PRESENT);
+        long id = 1L;
+        Attendance existingAttendance = new Attendance();
+        existingAttendance.setAttendanceId(id);
+        existingAttendance.setDate(LocalDate.now().minusDays(1)); // Some existing date
+        existingAttendance.setStatus(AttendanceStatus.PRESENT); // Some existing status
+
+        Attendance updatedAttendance = new Attendance();
+        updatedAttendance.setAttendanceId(id);
+        updatedAttendance.setDate(LocalDate.now()); // Updated date
+        updatedAttendance.setStatus(AttendanceStatus.ABSENT); // Updated status
 
         when(attendanceRepo.findById(id)).thenReturn(Optional.of(existingAttendance));
         when(attendanceRepo.save(any(Attendance.class))).thenReturn(updatedAttendance);
@@ -112,23 +121,54 @@ public class AttendanceServiceImplTest {
         // Assert
         assertEquals("Success", response.getStatus());
         assertEquals("Attendance record updated successfully", response.getMessage());
+        assertNotNull(response.getData());
         assertEquals(updatedAttendance, response.getData());
     }
 
+
     @Test
-    void testUpdateAttendance_WithInvalidId_ShouldReturnFailedResponse() {
+    public void testUpdateAttendance_WithInvalidId_ShouldReturnFailedResponse() {
         // Arrange
-        Long id = 1L;
-        when(attendanceRepo.findById(id)).thenReturn(Optional.empty());
+        long invalidId = 999L; // Assuming this ID does not exist
+        Attendance updatedAttendance = new Attendance();
+        updatedAttendance.setAttendanceId(invalidId);
+        updatedAttendance.setDate(LocalDate.now());
+        updatedAttendance.setStatus(AttendanceStatus.PRESENT);
+
+        when(attendanceRepo.findById(invalidId)).thenReturn(Optional.empty());
 
         // Act
-        APIResponse response = attendanceService.updateAttendance(id, new Attendance());
+        APIResponse response = attendanceService.updateAttendance(invalidId, updatedAttendance);
 
         // Assert
         assertEquals("Failed", response.getStatus());
         assertEquals("Attendance does not exist", response.getMessage());
-        verify(attendanceRepo, times(1)).findById(id);
-        verifyNoMoreInteractions(attendanceRepo);
+        assertEquals(null, response.getData());
+    }
+    @Test
+    public void testUpdateAttendance_WithException_ShouldReturnFailedResponse() {
+        // Arrange
+        long id = 1L;
+        Attendance existingAttendance = new Attendance();
+        existingAttendance.setAttendanceId(id);
+        existingAttendance.setDate(LocalDate.now().minusDays(1)); // Some existing date
+        existingAttendance.setStatus(AttendanceStatus.PRESENT); // Some existing status
+
+        Attendance updatedAttendance = new Attendance();
+        updatedAttendance.setAttendanceId(id);
+        updatedAttendance.setDate(LocalDate.now()); // Updated date
+        updatedAttendance.setStatus(AttendanceStatus.ABSENT); // Updated status
+
+        when(attendanceRepo.findById(id)).thenReturn(Optional.of(existingAttendance));
+        when(attendanceRepo.save(any(Attendance.class))).thenThrow(ResourceNotFoundException.class);
+
+        // Act
+        APIResponse response = attendanceService.updateAttendance(id, updatedAttendance);
+
+        // Assert
+        assertEquals("Failed", response.getStatus());
+        assertEquals("Error updating attendance record", response.getMessage());
+        assertEquals(null, response.getData());
     }
 
     @Test
@@ -152,17 +192,18 @@ public class AttendanceServiceImplTest {
     @Test
     public void testGetAttendanceByParticipantId_WithInvalidParticipantId_ShouldReturnFailedResponse() {
         // Arrange
-        Long invalidParticipantId = 999L; // Assuming this participant ID does not exist in the database
-
-        // Mock behavior of attendanceRepo to return an empty list when findByParticipantId is called with the invalid participant ID
-        when(attendanceRepo.findByParticipantId(any())).thenReturn(Collections.emptyList());
+        long invalidParticipantId = 999L; // Assuming this ID does not exist
+        Participants invalidParticipant = new Participants(invalidParticipantId); // Creating a participant object with the invalid ID
+        when(attendanceRepo.findByParticipantId(eq(invalidParticipant)))
+                .thenReturn(Collections.emptyList()); // Simulate no attendance records found
 
         // Act
-        APIResponse response = attendanceService.getAttendanceByParticipantId(new Participants(invalidParticipantId));
+        APIResponse response = attendanceService.getAttendanceByParticipantId(invalidParticipant);
 
         // Assert
         assertEquals("Failed", response.getStatus());
         assertEquals("Attendance does not exist", response.getMessage());
+        assertNull(response.getData());
     }
 
     @Test
