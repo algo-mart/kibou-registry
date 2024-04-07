@@ -149,7 +149,7 @@ public class AttendanceServiceImplTest {
 
         // Assert
         assertEquals("Failed", response.getStatus());
-        assertEquals("Error updating attendance record", response.getMessage());
+        assertEquals("Attendance does not exist", response.getMessage());
         assertNull(response.getData());
     }
 
