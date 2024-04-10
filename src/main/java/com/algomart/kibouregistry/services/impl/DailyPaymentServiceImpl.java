@@ -1,6 +1,6 @@
 package com.algomart.kibouregistry.services.impl;
 
-import com.algomart.kibouregistry.entity.SearchOperation;
+import com.algomart.kibouregistry.enums.SearchOperation;
 import com.algomart.kibouregistry.enums.EventType;
 import com.algomart.kibouregistry.exceptions.PaymentNotFoundException;
 import com.algomart.kibouregistry.models.PaymentRequest;
