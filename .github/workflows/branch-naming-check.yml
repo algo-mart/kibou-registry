@@ -21,35 +21,33 @@ jobs:
             return pr.data.head.ref;
           result-encoding: string
 
-      - name: Check Branch Prefix
-        id: check_prefix
+      - name: Check If Admin
+        id: check_admin
         uses: actions/github-script@v5
         with:
           script: |
-            const branch_name = "${{ steps.pr_branch.outputs.result }}";
             const current_user = (process.env.GITHUB_ACTOR).toLowerCase();
-            const admins = ["Realwale", "olusolaa", "toluwase1"];  // Add the list of admin usernames here
-            const allowed_users = [...admins, current_user];
-            let prefix_matched = false;
-            let user_prefix = "";
-
-            for (const user of allowed_users) {
-              const expected_prefix = user.toLowerCase() + '/';
-              if (branch_name.startsWith(expected_prefix)) {
-                prefix_matched = true;
-                user_prefix = expected_prefix;
-                break;
-              }
-            }
-
-            if (!prefix_matched) {
-              console.log(`Branch name: ${branch_name}`);
-              console.log("Branch name does not start with the current user's or any admin's username.");
-              core.setFailed("Branch prefix check failed.");
-            }
-
-            return user_prefix;
+            const admins = ["admin1", "admin2", "admin3"];  // Add the list of admin usernames here
+            const is_admin = admins.includes(current_user);
+            console.log(`Current user: ${current_user}`);
+            console.log(`Is admin: ${is_admin}`);
+            return is_admin.toString();
           result-encoding: string
+
+      - name: Check Branch Name
+        if: ${{ steps.check_admin.outputs.result != 'true' }}
+        run: |
+          branch_name="${{ steps.pr_branch.outputs.result }}"
+          expected_prefix="$(echo $GITHUB_ACTOR | tr '[:upper:]' '[:lower:]')/"
+          actual_prefix="${branch_name%%/*}/"
+          if [[ ! $branch_name =~ ^$expected_prefix ]]; then
+            echo "Branch name: $branch_name"
+            echo "Expected prefix: $expected_prefix"
+            echo "Branch name does not follow the expected naming convention."
+            echo "Actual prefix: $actual_prefix"
+            echo "Expected prefix: $expected_prefix[issue-name]"
+            exit 1
+          fi
 
       - name: Check Issue Match
         if: ${{ steps.check_prefix.outcome != 'failure' }}
