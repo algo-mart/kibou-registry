@@ -36,7 +36,6 @@ public class Participants {
 
     @ManyToOne
     @JoinColumn(name = "event_id")
-    //@NotNull(message = "Event must be stated")
     private Events event;
 
     @OneToMany(mappedBy = "participantId", cascade = CascadeType.ALL)
