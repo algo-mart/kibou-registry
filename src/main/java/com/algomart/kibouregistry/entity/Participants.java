@@ -1,7 +1,11 @@
 package com.algomart.kibouregistry.entity;
 
 import com.algomart.kibouregistry.enums.Category;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,22 +26,21 @@ public class Participants {
     private Long participantId;
 
     @Column(name = "name")
+    @NotBlank(message = "Name is required")
     private String name;
 
-    @Column(name = "email")
-    private String email;
-
-    @Column(name = "phone")
-    private String phone;
-
-    @Column(name = "address")
-    private String address;
-
     @Enumerated(EnumType.STRING)
+    @NotNull(message = "Category is required")
     @Column(name = "category")
     private Category category;
 
+    @ManyToOne
+    @JoinColumn(name = "event_id")
+    //@NotNull(message = "Event must be stated")
+    private Events event;
+
     @OneToMany(mappedBy = "participantId", cascade = CascadeType.ALL)
+    @JsonIgnore
     private List<Attendance> attendanceList;
 
     @ManyToMany(cascade = { CascadeType.ALL })
@@ -48,8 +51,12 @@ public class Participants {
     )
     private List<Notifications> notificationList;
 
-    @ManyToOne
-    @JoinColumn(name = "event_id")
-    private Events event;
+    @OneToOne(cascade = CascadeType.ALL)
+    @JsonProperty("contact_info")
+    private ContactInfo contactInfo;
+
+    public Participants(Long participantId) {
+        this.participantId = participantId;
+    }
 
 }
