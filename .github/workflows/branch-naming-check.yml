@@ -21,16 +21,68 @@ jobs:
             return pr.data.head.ref;
           result-encoding: string
 
-      - name: Check Branch Name
+      - name: Check Branch Prefix
+        id: check_prefix
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const branch_name = "${{ steps.pr_branch.outputs.result }}";
+            const current_user = (process.env.GITHUB_ACTOR).toLowerCase();
+            const admins = ["Realwale", "olusolaa", "toluwase1"];  // Add the list of admin usernames here
+            const allowed_users = [...admins, current_user];
+            let prefix_matched = false;
+            let user_prefix = "";
+
+            for (const user of allowed_users) {
+              const expected_prefix = user.toLowerCase() + '/';
+              if (branch_name.startsWith(expected_prefix)) {
+                prefix_matched = true;
+                user_prefix = expected_prefix;
+                break;
+              }
+            }
+
+            if (!prefix_matched) {
+              console.log(`Branch name: ${branch_name}`);
+              console.log("Branch name does not start with the current user's or any admin's username.");
+              core.setFailed("Branch prefix check failed.");
+            }
+
+            return user_prefix;
+          result-encoding: string
+
+      - name: Check Issue Match
+        if: ${{ steps.check_prefix.outcome != 'failure' }}
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const branch_name = "${{ steps.pr_branch.outputs.result }}";
+            const user_prefix = "${{ steps.check_prefix.outputs.result }}";
+            const issue_name = branch_name.substring(user_prefix.length);
+            let issue_exists = false;
+            
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+            });
+
+            for (const issue of issues.data) {
+              if (issue.title === issue_name) {
+                issue_exists = true;
+                break;
+              }
+            }
+
+            if (!issue_exists) {
+              console.log(`Branch name: ${branch_name}`);
+              console.log("Your branch does not target any open issue.");
+              core.setFailed("Issue match check failed.");
+            }
+
+          result-encoding: string
+
+      - name: Output result
+        if: ${{ steps.check_prefix.outcome == 'failure' || steps.check_issue.outcome == 'failure' }}
         run: |
-          branch_name="${{ steps.pr_branch.outputs.result }}"
-          expected_prefix="$(echo $GITHUB_ACTOR | tr '[:upper:]' '[:lower:]')/"
-          actual_prefix="${branch_name%%/*}/"
-          if [[ ! $branch_name =~ ^$expected_prefix ]]; then
-            echo "Branch name: $branch_name"
-            echo "Expected prefix: $expected_prefix"
-            echo "Branch name does not follow the expected naming convention."
-            echo "Actual prefix: $actual_prefix"
-            echo "Expected prefix: $expected_prefix[issue-name]"
-            exit 1
-          fi
+          echo "Branch naming check failed."
