@@ -1,5 +1,6 @@
 package com.algomart.kibouregistry.entity;
 
+import com.algomart.kibouregistry.enums.EventType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,11 +20,14 @@ public class DailyPayments {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")
-    private Long paymentId;
+    private Long id;
 
     @Column(name = "date")
     private Date date;
 
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
+
+    @Column(name = "event type")
+    private EventType eventType;
 }
