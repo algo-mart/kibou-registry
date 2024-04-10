@@ -14,6 +14,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
+
+import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.Optional;
@@ -31,22 +34,23 @@ public class DailyPaymentServiceImplTest {
     private PaymentResponse paymentResponse;
     @BeforeEach
     public void setUp() {
-        paymentRequest = new PaymentRequest(new Date(), 100.00, EventType.EVENT_ONE);
-        dailyPayments = new DailyPayments(1L, new Date(), 100.0, EventType.EVENT_ONE);
-        paymentResponse = new PaymentResponse(1L, new Date(), 100.0, EventType.EVENT_ONE);
+        paymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(100.00), EventType.EVENT_ONE);
+        dailyPayments = new DailyPayments(1L, new Date(), BigDecimal.valueOf(100.00), EventType.EVENT_ONE);
+        paymentResponse = new PaymentResponse(1L, new Date(), BigDecimal.valueOf(100.00), EventType.EVENT_ONE);
     }
 
     @Test
 
     public void testFindAll() {
         Page<DailyPayments> page = new PageImpl<>(Arrays.asList(dailyPayments));
-        when(dailyPaymentsRepo.findAll(any(), any(PageRequest.class))).thenReturn(page);
-        Page<PaymentResponse> result = dailyPaymentService.findAll(new Date(), new Date(), EventType.DEBIT, PageRequest.of(0, 10));
+        when(dailyPaymentsRepo.findAll(any(Specification.class), any(PageRequest.class))).thenReturn(page);
+
+        Page<PaymentResponse> result = dailyPaymentService.findAll(new Date(), new Date(), EventType.EVENT_ONE, PageRequest.of(0, 10));
         assertEquals(1, result.getTotalElements());
         assertEquals(paymentResponse, result.getContent().get(0));
-        verify(dailyPaymentsRepo, times(1)).findAll(any(), any(PageRequest.class));
-    }
 
+        verify(dailyPaymentsRepo, times(1)).findAll(any(Specification.class), any(PageRequest.class));
+    }
     @Test
 
     public void testFindById() {

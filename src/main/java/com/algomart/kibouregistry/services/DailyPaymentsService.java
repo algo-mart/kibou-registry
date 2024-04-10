@@ -12,6 +12,7 @@ public interface DailyPaymentsService {
     Page<PaymentResponse> findAll(Date startDate, Date endDate, EventType eventType, Pageable pageable);
 
     PaymentResponse findById(Long theId);
+    void deleteById(Long theId);
 
     PaymentResponse save(PaymentRequest theDailyPayments);
 

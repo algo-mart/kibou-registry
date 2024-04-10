@@ -56,16 +56,10 @@ public class DailyPaymentController {
         PaymentResponse payment = dailyPaymentsService.update(id, paymentRequest);
         return new ResponseEntity<>(payment, HttpStatus.OK);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletePayment(@PathVariable Long id) {
+        dailyPaymentsService.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
 }
-
-
-
-
-
-
-
-
-
-
-
-
