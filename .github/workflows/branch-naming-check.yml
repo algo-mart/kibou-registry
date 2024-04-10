@@ -77,8 +77,8 @@ jobs:
             
             if (!issue_exists) {
               console.log(`Branch name: ${branch_name}`);
-              console.log(`Expected branch suffix: ${issue_number}-[issue-title]`);
-              console.log("The remaining part of the branch name does not match the issue number and title.");
+              console.log(`Expected branch suffix: ${issue_number}-${expected_issue_title.toLowerCase().replace(/\s+/g, '-')}`);
+              console.log("Your branch does not target any open issue.");
               core.setFailed("Issue match check failed.");
             }
 
