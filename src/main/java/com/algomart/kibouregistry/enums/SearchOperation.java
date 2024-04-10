@@ -1,4 +1,4 @@
-package com.algomart.kibouregistry.entity;
+package com.algomart.kibouregistry.enums;
 
 public enum SearchOperation {
     EQUAL,
