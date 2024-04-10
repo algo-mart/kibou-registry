@@ -86,4 +86,9 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
                 paymentRequest.getEventType()
         );
     }
+
+    @Override
+    public void deleteById(Long id) {
+        dailyPaymentsRepo.deleteById(id);
+    }
 }
