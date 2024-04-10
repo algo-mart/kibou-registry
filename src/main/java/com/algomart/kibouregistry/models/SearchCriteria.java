@@ -1,6 +1,6 @@
 package com.algomart.kibouregistry.models;
 
-import com.algomart.kibouregistry.entity.SearchOperation;
+import com.algomart.kibouregistry.enums.SearchOperation;
 import lombok.Data;
 
 @Data
