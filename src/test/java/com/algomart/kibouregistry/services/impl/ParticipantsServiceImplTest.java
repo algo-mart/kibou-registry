@@ -42,8 +42,6 @@ public class ParticipantsServiceImplTest {
     @BeforeEach
     public void setUp() {
 
-
-        // Setup a participant object
         participant = new Participants();
         participant.setParticipantId(1L);
         participant.setName("John Doe");
