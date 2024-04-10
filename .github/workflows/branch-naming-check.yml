@@ -27,7 +27,7 @@ jobs:
         with:
           script: |
             const current_user = (process.env.GITHUB_ACTOR).toLowerCase();
-            const admins = ["admin1", "admin2", "admin3"];  // Add the list of admin usernames here
+            const admins = ["Realwale", "olusolaa", "toluwase1"];  // Add the list of admin usernames here
             const is_admin = admins.includes(current_user);
             console.log(`Current user: ${current_user}`);
             console.log(`Is admin: ${is_admin}`);
