@@ -27,52 +27,55 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     @Override
     public APIResponse recordAttendance(Attendance attendance) {
-        Participants participant = participantsRepo.findById(attendance.getParticipantId().getParticipantId()).orElse(null);
+        if (attendance != null && attendance.getParticipantId() != null) {
+            Optional<Participants> optionalParticipant = participantsRepo.findById(attendance.getParticipantId().getParticipantId());
 
-        // Check if the participant is found
-        if (participant != null) {
-            attendance.setParticipantId(participant);
-            attendanceRepo.save(attendance);
+            if (optionalParticipant.isPresent()) {
+                Participants participant = optionalParticipant.get();
 
-            return APIResponse.builder()
-                    .status("Success")
-                    .message("Attendance recorded successfully")
-                    .data(attendance)
-                    .build();
+                attendance.setParticipantId(participant);
+                attendanceRepo.save(attendance);
+
+                return APIResponse.builder()
+                        .status("Success")
+                        .message("Attendance recorded successfully")
+                        .data(attendance)
+                        .build();
+            } else {
+                return APIResponse.builder()
+                        .status("Failed")
+                        .message("Participant cannot be found")
+                        .build();
+            }
         } else {
             return APIResponse.builder()
                     .status("Failed")
-                    .message("Participant cannot be found")
+                    .message("Invalid attendance record: Participant ID is null")
                     .build();
         }
     }
 
+
     @Override
     public APIResponse getAllAttendance(int pageSize, int pageNumber) {
         try {
-            // Create a Pageable object for pagination and sorting by date in descending order
             Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("date").descending());
 
-            // Retrieve attendance records with pagination and sorting
             Page<Attendance> attendancePage = attendanceRepo.findAll(pageable);
 
-            // Check if the page is empty
             if (attendancePage.isEmpty()) {
-                // If no records found, return failure response
                 return APIResponse.builder()
                         .status("Failed")
                         .message("No attendance records found.")
                         .build();
             }
 
-            // Construct success response with paginated attendance records
             return APIResponse.builder()
                     .status("Success")
                     .message("Attendance records retrieved successfully")
                     .data(attendancePage.getContent())
                     .build();
-        } catch (Exception e) {
-            // Handle any exceptions and return failure response
+        } catch (ResourceNotFoundException e) {
             return APIResponse.builder()
                     .status("Failed")
                     .message("Error retrieving attendance records: " + e.getMessage())
@@ -103,15 +106,12 @@ public class AttendanceServiceImpl implements AttendanceService {
         try {
             Optional<Attendance> optionalAttendance = attendanceRepo.findById(id);
 
-            // Check if the attendance record exists
             if (optionalAttendance.isPresent()) {
                 Attendance existingAttendance = optionalAttendance.get();
 
-                // Update the existing attendance record
                 existingAttendance.setDate(attendance.getDate());
                 existingAttendance.setStatus(attendance.getStatus());
 
-                // Save the updated attendance record
                 attendanceRepo.save(existingAttendance);
 
                 return APIResponse.builder()
@@ -120,14 +120,12 @@ public class AttendanceServiceImpl implements AttendanceService {
                         .data(existingAttendance)
                         .build();
             } else {
-                // Attendance record with the given ID was not found
                 return APIResponse.builder()
                         .status("Failed")
                         .message("Attendance does not exist")
                         .build();
             }
         } catch (ResourceNotFoundException ex) {
-            // Handle other potential exceptions
             return APIResponse.builder()
                     .status("Failed")
                     .message("Error updating attendance record: " + ex.getMessage())
