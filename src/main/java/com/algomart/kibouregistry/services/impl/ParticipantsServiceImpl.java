@@ -1,7 +1,9 @@
 package com.algomart.kibouregistry.services.impl;
 
+import com.algomart.kibouregistry.entity.Events;
 import com.algomart.kibouregistry.entity.Participants;
 import com.algomart.kibouregistry.entity.response.APIResponse;
+import com.algomart.kibouregistry.repository.EventsRepo;
 import com.algomart.kibouregistry.repository.ParticipantsRepo;
 import com.algomart.kibouregistry.services.ParticipantsService;
 import lombok.AllArgsConstructor;
@@ -18,6 +20,7 @@ import java.util.Optional;
 public class ParticipantsServiceImpl implements ParticipantsService {
 
     private final ParticipantsRepo participantsRepo;
+    private final EventsRepo eventsRepo;
 
     @Override
     public APIResponse addParticipant(Participants participant) {
@@ -40,11 +43,27 @@ public class ParticipantsServiceImpl implements ParticipantsService {
                     .build();
         }
 
+        // Check if event is null
+        if (participant.getEvent() == null) {
+            return APIResponse.builder()
+                    .status("Failed")
+                    .message("Event must be stated")
+                    .build();
+        }
+
+        // Save the event entity if it's not already saved
+        Events event = participant.getEvent();
+        if (event.getEventId() == null) {
+            event = eventsRepo.save(event);
+        }
+
         // Proceed to save the participant
         Participants newParticipant = new Participants();
         newParticipant.setName(participant.getName());
         newParticipant.setCategory(participant.getCategory());
         newParticipant.setContactInfo(participant.getContactInfo());
+        newParticipant.setEvent(event);
+
         Participants savedParticipant = participantsRepo.save(newParticipant);
 
         // Construct the API response with the ID of the saved participant
@@ -97,14 +116,45 @@ public class ParticipantsServiceImpl implements ParticipantsService {
 
     @Override
     public APIResponse updateParticipant(Long id, Participants participant) {
-        if (!participantsRepo.existsById(id)) {
+        // Check if the participant exists
+        Optional<Participants> optionalExistingParticipant = participantsRepo.findById(id);
+        if (optionalExistingParticipant.isEmpty()) {
             return APIResponse.builder()
                     .status("Failed")
                     .message("Participant not found")
                     .build();
         }
-        participant.setParticipantId(id);
-        Participants updatedParticipant = participantsRepo.save(participant);
+        Participants existingParticipant = optionalExistingParticipant.get();
+
+        // Update the participant fields with the new values
+        if (participant.getName() != null) {
+            existingParticipant.setName(participant.getName());
+        }
+        if (participant.getCategory() != null) {
+            existingParticipant.setCategory(participant.getCategory());
+        }
+        if (participant.getContactInfo() != null) {
+            existingParticipant.setContactInfo(participant.getContactInfo());
+        }
+
+        // Check if the event ID is provided
+        if (participant.getEvent() != null && participant.getEvent().getEventId() != null) {
+            // Fetch the event entity from the repository
+            Optional<Events> optionalEvent = eventsRepo.findById(participant.getEvent().getEventId());
+            if (optionalEvent.isEmpty()) {
+                return APIResponse.builder()
+                        .status("Failed")
+                        .message("Event does not exist")
+                        .build();
+            }
+            Events event = optionalEvent.get();
+            // Update the participant's event association
+            existingParticipant.setEvent(event);
+        }
+
+        // Save the updated participant
+        Participants updatedParticipant = participantsRepo.save(existingParticipant);
+
         return APIResponse.builder()
                 .status("Success")
                 .message("Participant updated successfully")
