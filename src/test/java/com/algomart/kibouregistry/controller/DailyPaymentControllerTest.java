@@ -35,7 +35,7 @@ public class DailyPaymentControllerTest {
     @BeforeEach
     public void setUp() {
         baseUrl = "http://localhost:" + port + "/api/payments";
-        paymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(100.00), EventType.EVENT_ONE);
+        paymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(100.00), EventType.REGULAR);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         requestEntity = new HttpEntity<>(paymentRequest, headers);
@@ -72,7 +72,7 @@ public class DailyPaymentControllerTest {
         ResponseEntity<PaymentResponse> addResponse = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
         Long paymentId = Objects.requireNonNull(addResponse.getBody()).getId();
 
-        PaymentRequest updatedPaymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(200.00), EventType.EVENT_TWO);
+        PaymentRequest updatedPaymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(200.00), EventType.SPECIAL);
         HttpEntity<PaymentRequest> updateRequestEntity = new HttpEntity<>(updatedPaymentRequest, new HttpHeaders());
 
         ResponseEntity<PaymentResponse> updateResponse = restTemplate.exchange(baseUrl + "/" + paymentId, HttpMethod.PUT, updateRequestEntity, PaymentResponse.class);
