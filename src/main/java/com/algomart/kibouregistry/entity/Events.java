@@ -1,5 +1,6 @@
 package com.algomart.kibouregistry.entity;
 import com.algomart.kibouregistry.enums.EventType;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 import java.util.Date;
@@ -32,5 +33,6 @@ public class Events {
     private Attendance attendance;
 
     @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
+    @JsonBackReference
     private List<Participants> participants;
 }
