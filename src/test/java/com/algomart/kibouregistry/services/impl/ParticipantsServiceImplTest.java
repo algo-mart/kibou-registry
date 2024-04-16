@@ -1,9 +1,11 @@
 package com.algomart.kibouregistry.services.impl;
 
 import com.algomart.kibouregistry.entity.ContactInfo;
+import com.algomart.kibouregistry.entity.Events;
 import com.algomart.kibouregistry.entity.Participants;
 import com.algomart.kibouregistry.entity.response.APIResponse;
 import com.algomart.kibouregistry.enums.Category;
+import com.algomart.kibouregistry.repository.EventsRepo;
 import com.algomart.kibouregistry.repository.ParticipantsRepo;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,8 +23,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
@@ -31,6 +32,9 @@ public class ParticipantsServiceImplTest {
 
     @Mock
     private ParticipantsRepo participantsRepo;
+
+    @Mock
+    private EventsRepo eventsRepo;
 
     @InjectMocks
     private ParticipantsServiceImpl participantsService;
@@ -50,6 +54,10 @@ public class ParticipantsServiceImplTest {
         contactInfo.setEmail("john.doe@example.com");
         participant.setContactInfo(contactInfo);
 
+        Events event = new Events();
+        event.setEventId(1L); // Set the event ID
+        participant.setEvent(event);
+
         // Setup success and failed APIResponse objects
         successResponse = APIResponse.builder()
                 .status("Success")
@@ -64,18 +72,70 @@ public class ParticipantsServiceImplTest {
     }
 
     @Test
-    public void testAddParticipant_Success() {
+    void testAddParticipant_Success() {
+        // Mock the behavior of findByContactInfoEmail to return null, indicating email doesn't exist
         when(participantsRepo.findByContactInfoEmail(anyString())).thenReturn(null);
-        when(participantsRepo.save(any(Participants.class))).thenReturn(participant);
 
+        // Mock the behavior of eventsRepo.save to return the event object
+        Events event = new Events();
+        event.setEventId(1L);
+        when(eventsRepo.save(any(Events.class))).thenReturn(event);
+
+        // Mock the behavior of participantsRepo.save to return the participant object
+        Participants savedParticipant = new Participants();
+        savedParticipant.setParticipantId(1L); // Set participant ID
+        when(participantsRepo.save(any(Participants.class))).thenReturn(savedParticipant);
+
+        // Create a participant object
+        Participants participant = new Participants();
+        participant.setParticipantId(1L);
+        participant.setName("John Doe");
+        participant.setCategory(Category.INTERN);
+        ContactInfo contactInfo = new ContactInfo();
+        contactInfo.setEmail("john.doe@example.com");
+        participant.setContactInfo(contactInfo);
+        Events newEvent = new Events();
+        event.setEventId(1L);
+        participant.setEvent(newEvent);
+
+        // Invoke the service method to add a participant
         APIResponse response = participantsService.addParticipant(participant);
-        assertEquals(successResponse.getStatus(), response.getStatus());
-        assertEquals(successResponse.getMessage(), response.getMessage());
-        assertEquals(participant.getParticipantId(), response.getData());
 
+        // Assert that the response status, message, and data match the expected values
+        assertEquals("Success", response.getStatus());
+        assertEquals("Participant created successfully", response.getMessage());
+        assertEquals(1L, response.getData()); // Assuming participant ID is 1
+
+        // Verify that findByContactInfoEmail and save methods were called once each
         verify(participantsRepo, times(1)).findByContactInfoEmail(anyString());
+        verify(eventsRepo, times(1)).save(any(Events.class));
         verify(participantsRepo, times(1)).save(any(Participants.class));
     }
+
+
+
+
+    @Test
+    void testAddParticipant_MissingContactInfo() {
+        // Create a participant with missing contact info
+        Participants participant = new Participants();
+        participant.setName("Jane Doe");
+        participant.setCategory(Category.MEMBER);
+
+        // Invoke the service method to add a participant
+        APIResponse response = participantsService.addParticipant(participant);
+
+        // Assert that the response status and message indicate failure due to missing contact info
+        assertEquals("Failed", response.getStatus());
+        assertEquals("Contact information is missing", response.getMessage());
+        assertNull(response.getData());
+
+        // Verify that findByContactInfoEmail and save methods were not called
+        verify(participantsRepo, never()).findByContactInfoEmail(anyString());
+        verify(eventsRepo, never()).save(any(Events.class));
+        verify(participantsRepo, never()).save(any(Participants.class));
+    }
+
 
     @Test
     public void testAddParticipant_Failure_MissingContactInfo() {
@@ -136,29 +196,83 @@ public class ParticipantsServiceImplTest {
     }
 
     @Test
-    public void testUpdateParticipant_Success() {
-        when(participantsRepo.existsById(anyLong())).thenReturn(true);
-        when(participantsRepo.save(any(Participants.class))).thenReturn(participant);
+    void testUpdateParticipant_Success() {
+        // Mock the behavior of findById to return an existing participant
+        Participants existingParticipant = new Participants();
+        existingParticipant.setParticipantId(1L);
+        existingParticipant.setName("Existing Participant");
+        existingParticipant.setCategory(Category.MEMBER);
+        ContactInfo existingContactInfo = new ContactInfo();
+        existingContactInfo.setEmail("existing@example.com");
+        existingParticipant.setContactInfo(existingContactInfo);
+        when(participantsRepo.findById(1L)).thenReturn(Optional.of(existingParticipant));
 
-        APIResponse response = participantsService.updateParticipant(1L, participant);
+        // Mock the behavior of findById to return an existing event
+        Events existingEvent = new Events();
+        existingEvent.setEventId(1L);
+        when(eventsRepo.findById(1L)).thenReturn(Optional.of(existingEvent));
+
+        // Mock the behavior of save to return the updated participant
+        Participants updatedParticipant = new Participants();
+        updatedParticipant.setParticipantId(1L);
+        updatedParticipant.setName("Updated Participant");
+        updatedParticipant.setCategory(Category.INTERN);
+        ContactInfo updatedContactInfo = new ContactInfo();
+        updatedContactInfo.setEmail("updated@example.com");
+        updatedParticipant.setContactInfo(updatedContactInfo);
+        when(participantsRepo.save(any(Participants.class))).thenReturn(updatedParticipant);
+
+        // Create a new participant with updated information
+        Participants updatedInfo = new Participants();
+        updatedInfo.setName("Updated Participant");
+        updatedInfo.setCategory(Category.INTERN);
+        ContactInfo updatedInfoContact = new ContactInfo();
+        updatedInfoContact.setEmail("updated@example.com");
+        updatedInfo.setContactInfo(updatedInfoContact);
+        Events updatedEvent = new Events();
+        updatedEvent.setEventId(1L);
+        updatedInfo.setEvent(updatedEvent);
+
+        // Invoke the service method to update the participant
+        APIResponse response = participantsService.updateParticipant(1L, updatedInfo);
+
+        // Assert that the response status, message, and data match the expected values
         assertEquals("Success", response.getStatus());
         assertEquals("Participant updated successfully", response.getMessage());
-        assertNotNull(response.getData());
+        assertEquals(updatedParticipant, response.getData());
 
-        verify(participantsRepo, times(1)).existsById(anyLong());
+        // Verify that findById and save methods were called once each
+        verify(participantsRepo, times(1)).findById(1L);
+        verify(eventsRepo, times(1)).findById(1L);
         verify(participantsRepo, times(1)).save(any(Participants.class));
     }
 
-    @Test
-    public void testUpdateParticipant_NotFound() {
-        when(participantsRepo.existsById(anyLong())).thenReturn(false);
 
-        APIResponse response = participantsService.updateParticipant(1L, participant);
+    @Test
+    void testUpdateParticipant_NotFound() {
+        // Mock the behavior of findById to return an empty optional, indicating participant not found
+        when(participantsRepo.findById(1L)).thenReturn(Optional.empty());
+
+        // Create a new participant with updated information
+        Participants updatedInfo = new Participants();
+        updatedInfo.setName("Updated Participant");
+        updatedInfo.setCategory(Category.INTERN);
+        ContactInfo updatedInfoContact = new ContactInfo();
+        updatedInfoContact.setEmail("updated@example.com");
+        updatedInfo.setContactInfo(updatedInfoContact);
+        Events updatedEvent = new Events();
+        updatedEvent.setEventId(1L);
+        updatedInfo.setEvent(updatedEvent);
+
+        // Invoke the service method to update the participant
+        APIResponse response = participantsService.updateParticipant(1L, updatedInfo);
+
+        // Assert that the response status and message match the expected values
         assertEquals("Failed", response.getStatus());
         assertEquals("Participant not found", response.getMessage());
 
-        verify(participantsRepo, times(1)).existsById(anyLong());
-        verify(participantsRepo, times(0)).save(any(Participants.class));
+        // Verify that findById method was called once
+        verify(participantsRepo, times(1)).findById(1L);
     }
 
     @Test
