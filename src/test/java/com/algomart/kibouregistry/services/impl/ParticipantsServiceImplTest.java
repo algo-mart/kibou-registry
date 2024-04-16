@@ -13,9 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -80,7 +78,7 @@ public class ParticipantsServiceImplTest {
 
         // Mock the behavior of participantsRepo.save to return the participant object
         Participants savedParticipant = new Participants();
-        savedParticipant.setParticipantId(1L); // Set participant ID
+        savedParticipant.setParticipantId(1L);
         when(participantsRepo.save(any(Participants.class))).thenReturn(savedParticipant);
 
         // Create a participant object
@@ -101,16 +99,13 @@ public class ParticipantsServiceImplTest {
         // Assert that the response status, message, and data match the expected values
         assertEquals("Success", response.getStatus());
         assertEquals("Participant created successfully", response.getMessage());
-        assertEquals(1L, response.getData()); // Assuming participant ID is 1
+        assertEquals(1L, response.getData());
 
         // Verify that findByContactInfoEmail and save methods were called once each
         verify(participantsRepo, times(1)).findByContactInfoEmail(anyString());
         verify(eventsRepo, times(1)).save(any(Events.class));
         verify(participantsRepo, times(1)).save(any(Participants.class));
     }
-
-
-
 
     @Test
     void testAddParticipant_MissingContactInfo() {
@@ -132,7 +127,6 @@ public class ParticipantsServiceImplTest {
         verify(eventsRepo, never()).save(any(Events.class));
         verify(participantsRepo, never()).save(any(Participants.class));
     }
-
 
     @Test
     public void testAddParticipant_Failure_MissingContactInfo() {
@@ -244,7 +238,6 @@ public class ParticipantsServiceImplTest {
         verify(participantsRepo, times(1)).save(any(Participants.class));
     }
 
-
     @Test
     void testUpdateParticipant_NotFound() {
         // Mock the behavior of findById to return an empty optional, indicating participant not found
@@ -296,5 +289,38 @@ public class ParticipantsServiceImplTest {
         verify(participantsRepo, times(0)).deleteById(anyLong());
     }
 
+    @Test
+    void testAddParticipant_MissingEvent() {
+        // Setup
+        Participants participant = new Participants();
+        participant.setName("John Doe");
+        participant.setCategory(Category.INTERN);
+        ContactInfo contactInfo = mock(ContactInfo.class); // Mock the ContactInfo object
+        participant.setContactInfo(contactInfo);
+        // No need to set the event, as it's supposed to be missing
+
+        // Invoke the method
+        APIResponse response = participantsService.addParticipant(participant);
+
+        // Verify
+        assertEquals("Failed", response.getStatus());
+        assertEquals("Event must be stated", response.getMessage());
+        assertNull(response.getData());
+    }
+
+    @Test
+    void testGetAllParticipants_PaginationSuccess() {
+        // Setup
+        Pageable pageable = PageRequest.of(0, 10, Sort.by("participantId").ascending());
+        when(participantsRepo.findAll(pageable)).thenReturn(new PageImpl<>(Collections.emptyList()));
+
+        // Invoke the method
+        APIResponse response = participantsService.getAllParticipants(10, 0);
+
+        // Verify
+        assertEquals("Failed", response.getStatus());
+        assertEquals("No participant was found.", response.getMessage());
+        assertNull(response.getData());
+    }
 
 }
