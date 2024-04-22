@@ -14,8 +14,8 @@ spring:
         format_sql: true
 
   mail:
-    username: alaoabdulhakeem55@gmail.com
-    password: bjrq ujqo gpyc ypql
+    username: EMAIL
+    password: PASSWORD
     host: smtp.gmail.com
     port: 465
     properties:
@@ -33,3 +33,8 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
+
+twilio:
+  account_sid: ACCOUNT_SID
+  auth_token: AUTH_TOKEN
+  trial_number: TRIAL_NUMBER
