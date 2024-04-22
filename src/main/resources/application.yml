@@ -35,6 +35,6 @@ logging:
     org.hibernate.type: TRACE
 
 twilio:
-  account_sid: ACCOUNT_SID
-  auth_token: AUTH_TOKEN
-  trial_number: TRIAL_NUMBER
+  account_sid: ACf655fe25a337de73ddf27ee002fbd70b
+  auth_token: 1636fdf4c5e4834d17fb6785b9dcd403
+  trial_number: +2348066334991
