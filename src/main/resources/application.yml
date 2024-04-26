@@ -14,10 +14,10 @@ spring:
         format_sql: true
 
   mail:
-    username: EMAIL
-    password: PASSWORD
     host: smtp.gmail.com
     port: 465
+    username: EMAIL
+    password: PASSWORD
     properties:
       mail:
         smtp:
@@ -25,6 +25,7 @@ spring:
           starttls.enable: true
           smtp.socketFactory.port: 465
           smtp.socketFactory.class: javax.net.ssl.SSLSocketFactory
+
 
 server:
   port: ${PORT:9000}
@@ -34,7 +35,8 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
 
+
 twilio:
-  account_sid: ACf655fe25a337de73ddf27ee002fbd70b
-  auth_token: 1636fdf4c5e4834d17fb6785b9dcd403
-  trial_number: +2348066334991
+  account_sid: ACCOUNT_SID
+  auth_token: AUTH_TOKEN
+  trial_number: TRIAL_NUMBER
