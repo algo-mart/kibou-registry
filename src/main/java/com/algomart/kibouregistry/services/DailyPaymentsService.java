@@ -1,6 +1,7 @@
 package com.algomart.kibouregistry.services;
 
 import com.algomart.kibouregistry.enums.EventType;
+import com.algomart.kibouregistry.models.MonthlyPaymentSummaryResponse;
 import com.algomart.kibouregistry.models.PaymentRequest;
 import com.algomart.kibouregistry.models.PaymentResponse;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ public interface DailyPaymentsService {
     PaymentResponse save(PaymentRequest theDailyPayments);
 
     PaymentResponse update(Long id, PaymentRequest theDailyPayment);
+    MonthlyPaymentSummaryResponse getMonthlyPaymentSummary(int month, int year);
 }
 
 

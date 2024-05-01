@@ -35,7 +35,7 @@ public class DailyPaymentControllerTest {
     @BeforeEach
     public void setUp() {
         baseUrl = "http://localhost:" + port + "/api/payments";
-        paymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(100.00), EventType.EVENT_ONE);
+        paymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(100.00), EventType.SPECIAL);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         requestEntity = new HttpEntity<>(paymentRequest, headers);
@@ -54,6 +54,7 @@ public class DailyPaymentControllerTest {
         Long paymentId = Objects.requireNonNull(addResponse.getBody()).getId();
 
         PaymentResponse paymentResponse = restTemplate.getForObject(baseUrl + "/" + paymentId, PaymentResponse.class);
+        System.out.println("check Url : " + baseUrl + "/" + paymentId);
         assertThat(paymentResponse).isNotNull();
         assertThat(paymentResponse.getId()).isEqualTo(paymentId);
     }
@@ -62,7 +63,7 @@ public class DailyPaymentControllerTest {
         restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
         restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
 
-        ResponseEntity<String> responseEntity = restTemplate.getForEntity(baseUrl + "?startDate=2020-01-01&endDate=2020-12-31&eventType=EVENT_ONE", String.class);
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity(baseUrl + "?startDate=2020-01-01&endDate=2020-12-31&eventType=SPECIAL", String.class);
 
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
@@ -72,7 +73,7 @@ public class DailyPaymentControllerTest {
         ResponseEntity<PaymentResponse> addResponse = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
         Long paymentId = Objects.requireNonNull(addResponse.getBody()).getId();
 
-        PaymentRequest updatedPaymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(200.00), EventType.EVENT_TWO);
+        PaymentRequest updatedPaymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(200.00), EventType.SPECIAL);
         HttpEntity<PaymentRequest> updateRequestEntity = new HttpEntity<>(updatedPaymentRequest, new HttpHeaders());
 
         ResponseEntity<PaymentResponse> updateResponse = restTemplate.exchange(baseUrl + "/" + paymentId, HttpMethod.PUT, updateRequestEntity, PaymentResponse.class);
@@ -91,5 +92,36 @@ public class DailyPaymentControllerTest {
 
         assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);}
 
+//    @Test
+//    public void testGetMonthlyPaymentSummary(){
+//        // add some payments
+//
+//        ResponseEntity<PaymentResponse> responseEntity1 = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
+//        ResponseEntity<PaymentResponse> responseEntity2 = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
+//        // Test if payment summary is correct
+//        int month = 4;
+//        int year = 2024;
+//
+//        String url = String.format("%s/monthly-summary?month=%d&year=%d", baseUrl, month, year);
+//        System.out.println("check Url : " + url);
+//        PaymentResponse paymentResponse = restTemplate.getForObject(url , PaymentResponse.class);
+//        assertThat( paymentResponse.getTotalAmount()).isGreaterThanOrEqualTo(BigDecimal.valueOf(200));
+//     //   assertThat(paymentResponse).isNotNull();
+//        // assertThat(paymentResponse.getId()).isEqualTo(paymentId);
+//
+//
+//
+//         // http://localhost:8080/monthly-summary?month=4&year=2023
+//    }
+    @Test
+    public void testAddAandB(){
+       double sum = addAandB(2,5);
+       assertThat(sum).isEqualTo(7);
+       assertThat(sum).isNotEqualTo(8);
+    }
+    public double addAandB (double a,double b){
+        return (a+b);
+
+    }
 }
 
