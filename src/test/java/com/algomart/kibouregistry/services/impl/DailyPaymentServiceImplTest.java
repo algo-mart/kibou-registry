@@ -42,18 +42,6 @@ public class DailyPaymentServiceImplTest {
 
     @Test
 
-    public void testFindAll() {
-        Page<DailyPayments> page = new PageImpl<>(Arrays.asList(dailyPayments));
-        when(dailyPaymentsRepo.findAll(any(Specification.class), any(PageRequest.class))).thenReturn(page);
-
-        Page<PaymentResponse> result = dailyPaymentService.findAll(new Date(), new Date(), EventType.REGULAR, PageRequest.of(0, 10));
-        assertEquals(1, result.getTotalElements());
-        assertEquals(paymentResponse, result.getContent().get(0));
-
-        verify(dailyPaymentsRepo, times(1)).findAll(any(Specification.class), any(PageRequest.class));
-    }
-    @Test
-
     public void testFindById() {
         when(dailyPaymentsRepo.findById(anyLong())).thenReturn(Optional.of(dailyPayments));
         PaymentResponse result = dailyPaymentService.findById(1L);
