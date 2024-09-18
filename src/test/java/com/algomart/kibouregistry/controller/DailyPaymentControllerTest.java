@@ -33,7 +33,7 @@ public class DailyPaymentControllerTest {
     private HttpEntity<PaymentRequest> requestEntity;
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         baseUrl = "http://localhost:" + port + "/api/payments";
         paymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(100.00), EventType.SPECIAL);
         HttpHeaders headers = new HttpHeaders();
@@ -42,14 +42,14 @@ public class DailyPaymentControllerTest {
     }
 
     @Test
-    public void testAddPayment() {
+     void testAddPayment() {
         ResponseEntity<PaymentResponse> responseEntity = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
         assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         assertThat(Objects.requireNonNull(responseEntity.getBody()).getTotalAmount()).isEqualTo(paymentRequest.getTotalAmount());
     }
 
     @Test
-    public void testGetPayment() {
+     void testGetPayment() {
         ResponseEntity<PaymentResponse> addResponse = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
         Long paymentId = Objects.requireNonNull(addResponse.getBody()).getId();
 
@@ -59,7 +59,7 @@ public class DailyPaymentControllerTest {
     }
 
     @Test
-    public void testFindAll() {
+     void testFindAll() {
         restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
         restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
 
@@ -69,7 +69,7 @@ public class DailyPaymentControllerTest {
     }
 
     @Test
-    public void testUpdatePayment() {
+     void testUpdatePayment() {
         ResponseEntity<PaymentResponse> addResponse = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
         Long paymentId = Objects.requireNonNull(addResponse.getBody()).getId();
 
@@ -83,7 +83,7 @@ public class DailyPaymentControllerTest {
     }
 
     @Test
-    public void testDeletePayment() {
+     void testDeletePayment() {
         ResponseEntity<PaymentResponse> addResponse = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
         Long paymentId = Objects.requireNonNull(addResponse.getBody()).getId();
 
