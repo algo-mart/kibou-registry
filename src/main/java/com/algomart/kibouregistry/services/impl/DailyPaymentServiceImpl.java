@@ -116,7 +116,7 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
 
         // Calculate the grand total and totals for each meeting type
         BigDecimal grandTotal = BigDecimal.ZERO;
-        Map<EventType, BigDecimal> meetingTypeTotals = new HashMap<>();
+        EnumMap<EventType, BigDecimal> meetingTypeTotals = new EnumMap<>(EventType.class);
         for (DailyPayments payment : payments) {
             grandTotal = grandTotal.add(payment.getTotalAmount());
             meetingTypeTotals.put(payment.getEventType(), meetingTypeTotals.getOrDefault(payment.getEventType(), BigDecimal.ZERO).add(payment.getTotalAmount()));
