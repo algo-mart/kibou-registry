@@ -54,10 +54,10 @@ public class DailyPaymentControllerTest {
         Long paymentId = Objects.requireNonNull(addResponse.getBody()).getId();
 
         PaymentResponse paymentResponse = restTemplate.getForObject(baseUrl + "/" + paymentId, PaymentResponse.class);
-        System.out.println("check Url : " + baseUrl + "/" + paymentId);
         assertThat(paymentResponse).isNotNull();
         assertThat(paymentResponse.getId()).isEqualTo(paymentId);
     }
+
     @Test
     public void testFindAll() {
         restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
@@ -90,38 +90,7 @@ public class DailyPaymentControllerTest {
         restTemplate.delete(baseUrl + "/" + paymentId);
         ResponseEntity<String> getResponse = restTemplate.getForEntity(baseUrl + "/" + paymentId, String.class);
 
-        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);}
-
-//    @Test
-//    public void testGetMonthlyPaymentSummary(){
-//        // add some payments
-//
-//        ResponseEntity<PaymentResponse> responseEntity1 = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
-//        ResponseEntity<PaymentResponse> responseEntity2 = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
-//        // Test if payment summary is correct
-//        int month = 4;
-//        int year = 2024;
-//
-//        String url = String.format("%s/monthly-summary?month=%d&year=%d", baseUrl, month, year);
-//        System.out.println("check Url : " + url);
-//        PaymentResponse paymentResponse = restTemplate.getForObject(url , PaymentResponse.class);
-//        assertThat( paymentResponse.getTotalAmount()).isGreaterThanOrEqualTo(BigDecimal.valueOf(200));
-//     //   assertThat(paymentResponse).isNotNull();
-//        // assertThat(paymentResponse.getId()).isEqualTo(paymentId);
-//
-//
-//
-//         // http://localhost:8080/monthly-summary?month=4&year=2023
-//    }
-    @Test
-    public void testAddAandB(){
-       double sum = addAandB(2,5);
-       assertThat(sum).isEqualTo(7);
-       assertThat(sum).isNotEqualTo(8);
-    }
-    public double addAandB (double a,double b){
-        return (a+b);
-
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 }
 

@@ -34,8 +34,8 @@ public class DailyPaymentServiceImplTest {
     private PaymentResponse paymentResponse;
     @BeforeEach
     public void setUp() {
-        paymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(100.00), EventType.SPECIAL);
-        dailyPayments = new DailyPayments(1L, new Date(), BigDecimal.valueOf(100.00), EventType.SPECIAL);
+        paymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(100.00), EventType.REGULAR);
+        dailyPayments = new DailyPayments(1L, new Date(), BigDecimal.valueOf(100.00), EventType.REGULAR);
         paymentResponse = new PaymentResponse(1L, new Date(), BigDecimal.valueOf(100.00), EventType.REGULAR);
     }
 
@@ -44,8 +44,7 @@ public class DailyPaymentServiceImplTest {
     public void testFindAll() {
         Page<DailyPayments> page = new PageImpl<>(Arrays.asList(dailyPayments));
         when(dailyPaymentsRepo.findAll(any(Specification.class), any(PageRequest.class))).thenReturn(page);
-
-        Page<PaymentResponse> result = dailyPaymentService.findAll(new Date(), new Date(), EventType.SPECIAL, PageRequest.of(0, 10));
+        Page<PaymentResponse> result = dailyPaymentService.findAll(new Date(), new Date(), EventType.REGULAR, PageRequest.of(0, 10));
         assertEquals(1, result.getTotalElements());
         assertEquals(paymentResponse, result.getContent().get(0));
 

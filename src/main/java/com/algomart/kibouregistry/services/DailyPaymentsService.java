@@ -18,7 +18,9 @@ public interface DailyPaymentsService {
     PaymentResponse save(PaymentRequest theDailyPayments);
 
     PaymentResponse update(Long id, PaymentRequest theDailyPayment);
+
     MonthlyPaymentSummaryResponse getMonthlyPaymentSummary(int month, int year);
+
 }
 
 

@@ -64,6 +64,7 @@ public class DailyPaymentController {
         return ResponseEntity.ok().build();
     }
 
+
     @GetMapping("/monthly-summary")
     public ResponseEntity<MonthlyPaymentSummaryResponse> getMonthlyPaymentSummary(
             @RequestParam int month,
@@ -71,4 +72,5 @@ public class DailyPaymentController {
         MonthlyPaymentSummaryResponse summaryResponse = dailyPaymentsService.getMonthlyPaymentSummary(month, year);
         return ResponseEntity.ok(summaryResponse);
     }
+
 }
