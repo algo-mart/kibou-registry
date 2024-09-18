@@ -3,101 +3,94 @@ package com.algomart.kibouregistry.controller;
 import com.algomart.kibouregistry.enums.EventType;
 import com.algomart.kibouregistry.models.PaymentRequest;
 import com.algomart.kibouregistry.models.PaymentResponse;
-import com.algomart.kibouregistry.services.DailyPaymentsService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.*;
+import org.springframework.test.context.ActiveProfiles;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.Objects;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.when;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@ExtendWith(MockitoExtension.class)
-class DailyPaymentControllerTest {
+@ActiveProfiles("test")
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+public class DailyPaymentControllerTest {
 
-    @Mock
-    private DailyPaymentsService dailyPaymentsService;
+    @LocalServerPort
+    private int port;
 
-    @InjectMocks
-    private DailyPaymentController dailyPaymentController;
+    @Autowired
+    private TestRestTemplate restTemplate;
 
-    @Test
-    void testFindAll() {
-        // Mock the service method call
-        List<PaymentResponse> paymentResponses = new ArrayList<>();
-        Page<PaymentResponse> page = new PageImpl<>(paymentResponses);
-        when(dailyPaymentsService.findAll(any(), any(), any(), any())).thenReturn(page);
+    private String baseUrl;
+    private PaymentRequest paymentRequest;
+    private HttpEntity<PaymentRequest> requestEntity;
 
-        // Perform the GET request
-        ResponseEntity<Page<PaymentResponse>> responseEntity = dailyPaymentController.findAll(null, null, null, Pageable.unpaged());
-
-        // Verify the response
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(page, responseEntity.getBody());
+    @BeforeEach
+     void setUp() {
+        baseUrl = "http://localhost:" + port + "/api/payments";
+        paymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(100.00), EventType.SPECIAL);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        requestEntity = new HttpEntity<>(paymentRequest, headers);
     }
 
     @Test
-    void testGetPayment() {
-        // Mock the service method call
-        PaymentResponse paymentResponse = new PaymentResponse(1L, new Date(), BigDecimal.TEN, EventType.REGULAR);
-        when(dailyPaymentsService.findById(anyLong())).thenReturn(paymentResponse);
-
-        // Perform the GET request
-        ResponseEntity<PaymentResponse> responseEntity = dailyPaymentController.getPayment(1L);
-
-        // Verify the response
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(paymentResponse, responseEntity.getBody());
+     void testAddPayment() {
+        ResponseEntity<PaymentResponse> responseEntity = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
+        assertThat(Objects.requireNonNull(responseEntity.getBody()).getTotalAmount()).isEqualTo(paymentRequest.getTotalAmount());
     }
 
     @Test
-    void testAddPayment() {
-        // Mock the service method call
-        PaymentRequest paymentRequest = new PaymentRequest(new Date(), BigDecimal.TEN, EventType.REGULAR);
-        PaymentResponse paymentResponse = new PaymentResponse(1L, paymentRequest.getDate(), paymentRequest.getTotalAmount(), paymentRequest.getEventType());
-        when(dailyPaymentsService.save(any(PaymentRequest.class))).thenReturn(paymentResponse);
+     void testGetPayment() {
+        ResponseEntity<PaymentResponse> addResponse = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
+        Long paymentId = Objects.requireNonNull(addResponse.getBody()).getId();
 
-        // Perform the POST request
-        ResponseEntity<PaymentResponse> responseEntity = dailyPaymentController.addPayment(paymentRequest);
-
-        // Verify the response
-        assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-        assertEquals(paymentResponse, responseEntity.getBody());
+        PaymentResponse paymentResponse = restTemplate.getForObject(baseUrl + "/" + paymentId, PaymentResponse.class);
+        assertThat(paymentResponse).isNotNull();
+        assertThat(paymentResponse.getId()).isEqualTo(paymentId);
     }
 
     @Test
-    void testUpdatePayment() {
-        // Mock the service method call
-        PaymentRequest paymentRequest = new PaymentRequest(new Date(), BigDecimal.TEN, EventType.REGULAR);
-        PaymentResponse paymentResponse = new PaymentResponse(1L, paymentRequest.getDate(), paymentRequest.getTotalAmount(), paymentRequest.getEventType());
-        when(dailyPaymentsService.update(anyLong(), any(PaymentRequest.class))).thenReturn(paymentResponse);
+     void testFindAll() {
+        restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
+        restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
 
-        // Perform the PUT request
-        ResponseEntity<PaymentResponse> responseEntity = dailyPaymentController.updatePayment(1L, paymentRequest);
+        ResponseEntity<String> responseEntity = restTemplate.getForEntity(baseUrl + "?startDate=2020-01-01&endDate=2020-12-31&eventType=SPECIAL", String.class);
 
-        // Verify the response
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        assertEquals(paymentResponse, responseEntity.getBody());
+        assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.OK);
     }
 
     @Test
-    void testDeletePayment() {
-        // Perform the DELETE request
-        ResponseEntity<Void> responseEntity = dailyPaymentController.deletePayment(1L);
+     void testUpdatePayment() {
+        ResponseEntity<PaymentResponse> addResponse = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
+        Long paymentId = Objects.requireNonNull(addResponse.getBody()).getId();
 
-        // Verify the response
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
+        PaymentRequest updatedPaymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(200.00), EventType.SPECIAL);
+        HttpEntity<PaymentRequest> updateRequestEntity = new HttpEntity<>(updatedPaymentRequest, new HttpHeaders());
+
+        ResponseEntity<PaymentResponse> updateResponse = restTemplate.exchange(baseUrl + "/" + paymentId, HttpMethod.PUT, updateRequestEntity, PaymentResponse.class);
+
+        assertThat(updateResponse.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(Objects.requireNonNull(updateResponse.getBody()).getTotalAmount()).isEqualTo(updatedPaymentRequest.getTotalAmount());
+    }
+
+    @Test
+     void testDeletePayment() {
+        ResponseEntity<PaymentResponse> addResponse = restTemplate.postForEntity(baseUrl, requestEntity, PaymentResponse.class);
+        Long paymentId = Objects.requireNonNull(addResponse.getBody()).getId();
+
+        restTemplate.delete(baseUrl + "/" + paymentId);
+        ResponseEntity<String> getResponse = restTemplate.getForEntity(baseUrl + "/" + paymentId, String.class);
+
+        assertThat(getResponse.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
     }
 }
+

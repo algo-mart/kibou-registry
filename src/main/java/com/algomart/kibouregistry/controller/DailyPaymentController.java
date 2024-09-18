@@ -2,6 +2,7 @@ package com.algomart.kibouregistry.controller;
 
 
 import com.algomart.kibouregistry.enums.EventType;
+import com.algomart.kibouregistry.models.MonthlyPaymentSummaryResponse;
 import com.algomart.kibouregistry.models.PaymentRequest;
 import com.algomart.kibouregistry.models.PaymentResponse;
 import com.algomart.kibouregistry.services.DailyPaymentsService;
@@ -62,4 +63,14 @@ public class DailyPaymentController {
         dailyPaymentsService.deleteById(id);
         return ResponseEntity.ok().build();
     }
+
+
+    @GetMapping("/monthly-summary")
+    public ResponseEntity<MonthlyPaymentSummaryResponse> getMonthlyPaymentSummary(
+            @RequestParam int month,
+            @RequestParam int year) {
+        MonthlyPaymentSummaryResponse summaryResponse = dailyPaymentsService.getMonthlyPaymentSummary(month, year);
+        return ResponseEntity.ok(summaryResponse);
+    }
+
 }
