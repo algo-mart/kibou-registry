@@ -1,6 +1,6 @@
 package com.algomart.kibouregistry.controller;
 
-import com.algomart.kibouregistry.entity.response.APIResponse;
+import com.algomart.kibouregistry.models.response.APIResponse;
 import com.algomart.kibouregistry.services.AttendanceReportService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

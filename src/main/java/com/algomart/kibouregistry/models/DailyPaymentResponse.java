@@ -9,10 +9,9 @@ import java.util.Date;
 
 @Data
 @AllArgsConstructor
-public class PaymentRequest {
+public class DailyPaymentResponse {
+    private Long id;
     private Date date;
     private BigDecimal totalAmount;
     private EventType eventType;
-
-
 }

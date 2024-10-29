@@ -20,7 +20,7 @@ public class DailyPayments {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "payment_id")
-    private Long id;
+    private Long dailyPaymentsId;
 
     @Column(name = "date")
     private Date date;

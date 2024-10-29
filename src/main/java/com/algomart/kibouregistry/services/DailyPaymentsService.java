@@ -1,22 +1,26 @@
 package com.algomart.kibouregistry.services;
 
 import com.algomart.kibouregistry.enums.EventType;
-import com.algomart.kibouregistry.models.PaymentRequest;
-import com.algomart.kibouregistry.models.PaymentResponse;
+import com.algomart.kibouregistry.models.MonthlyPaymentSummaryResponse;
+import com.algomart.kibouregistry.models.DailyPaymentRequest;
+import com.algomart.kibouregistry.models.DailyPaymentResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
 
 public interface DailyPaymentsService {
-    Page<PaymentResponse> findAll(Date startDate, Date endDate, EventType eventType, Pageable pageable);
+    Page<DailyPaymentResponse> findAll(Date startDate, Date endDate, EventType eventType, Pageable pageable);
 
-    PaymentResponse findById(Long theId);
+    DailyPaymentResponse findById(Long theId);
     void deleteById(Long theId);
 
-    PaymentResponse save(PaymentRequest theDailyPayments);
+    DailyPaymentResponse save(DailyPaymentRequest theDailyPayments);
 
-    PaymentResponse update(Long id, PaymentRequest theDailyPayment);
+    DailyPaymentResponse update(Long id, DailyPaymentRequest theDailyPayment);
+
+    MonthlyPaymentSummaryResponse getMonthlyPaymentSummary(int month, int year);
+
 }
 
 

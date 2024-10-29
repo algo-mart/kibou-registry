@@ -2,7 +2,7 @@ package com.algomart.kibouregistry.services.impl;
 
 import com.algomart.kibouregistry.entity.Attendance;
 import com.algomart.kibouregistry.entity.Participants;
-import com.algomart.kibouregistry.entity.response.APIResponse;
+import com.algomart.kibouregistry.models.response.APIResponse;
 import com.algomart.kibouregistry.exceptions.ResourceNotFoundException;
 import com.algomart.kibouregistry.repository.AttendanceRepo;
 import com.algomart.kibouregistry.repository.ParticipantsRepo;
@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -54,6 +55,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                     .build();
         }
     }
+
 
 
     @Override
@@ -126,6 +128,7 @@ public class AttendanceServiceImpl implements AttendanceService {
                         .build();
             }
         } catch (ResourceNotFoundException ex) {
+
             return APIResponse.builder()
                     .status("Failed")
                     .message("Error updating attendance record: " + ex.getMessage())

@@ -2,9 +2,10 @@ package com.algomart.kibouregistry.services.impl;
 
 import com.algomart.kibouregistry.enums.SearchOperation;
 import com.algomart.kibouregistry.enums.EventType;
-import com.algomart.kibouregistry.exceptions.PaymentNotFoundException;
-import com.algomart.kibouregistry.models.PaymentRequest;
-import com.algomart.kibouregistry.models.PaymentResponse;
+import com.algomart.kibouregistry.exceptions.DailyPaymentNotFoundException;
+import com.algomart.kibouregistry.models.MonthlyPaymentSummaryResponse;
+import com.algomart.kibouregistry.models.DailyPaymentRequest;
+import com.algomart.kibouregistry.models.DailyPaymentResponse;
 import com.algomart.kibouregistry.models.SearchCriteria;
 import com.algomart.kibouregistry.repository.DailyPaymentsRepo;
 import com.algomart.kibouregistry.entity.DailyPayments;
@@ -15,7 +16,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+
+import java.math.BigDecimal;
+import java.time.Month;
+import java.util.*;
+
 
 @Service
 public class DailyPaymentServiceImpl implements DailyPaymentsService {
@@ -26,7 +31,7 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
         this.dailyPaymentsRepo = dailyPaymentsRepo;
     }
 
-    public Page<PaymentResponse> findAll(Date startDate, Date endDate, EventType eventType, Pageable pageable) {
+    public Page<DailyPaymentResponse> findAll(Date startDate, Date endDate, EventType eventType, Pageable pageable) {
         GenericSpecification<DailyPayments> spec = new GenericSpecification<>();
         if (startDate != null) {
             spec.add(new SearchCriteria("date", startDate, SearchOperation.GREATER_THAN));
@@ -42,48 +47,48 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
     }
 
     @Override
-    public PaymentResponse findById(Long id) {
+    public DailyPaymentResponse findById(Long id) {
         DailyPayments dailyPayments = dailyPaymentsRepo.findById(id)
-                .orElseThrow(() -> new PaymentNotFoundException(id));
+                .orElseThrow(() -> new DailyPaymentNotFoundException(id));
 
         return convertToResponse(dailyPayments);
     }
 
     @Override
-    public PaymentResponse save(PaymentRequest paymentRequest) {
-        DailyPayments dailyPayments = convertToEntity(paymentRequest);
+    public DailyPaymentResponse save(DailyPaymentRequest dailyPaymentRequest) {
+        DailyPayments dailyPayments = convertToEntity(dailyPaymentRequest);
         dailyPayments = dailyPaymentsRepo.save(dailyPayments);
         return convertToResponse(dailyPayments);
     }
 
     @Override
-    public PaymentResponse update(Long id, PaymentRequest paymentRequest) {
+    public DailyPaymentResponse update(Long id, DailyPaymentRequest dailyPaymentRequest) {
         DailyPayments dailyPayments = dailyPaymentsRepo.findById(id)
-                .orElseThrow(() -> new PaymentNotFoundException(id));
+                .orElseThrow(() -> new DailyPaymentNotFoundException(id));
 
-        dailyPayments.setDate(paymentRequest.getDate());
-        dailyPayments.setTotalAmount(paymentRequest.getTotalAmount());
-        dailyPayments.setEventType(paymentRequest.getEventType());
+        dailyPayments.setDate(dailyPaymentRequest.getDate());
+        dailyPayments.setTotalAmount(dailyPaymentRequest.getTotalAmount());
+        dailyPayments.setEventType(dailyPaymentRequest.getEventType());
 
         dailyPayments = dailyPaymentsRepo.save(dailyPayments);
         return convertToResponse(dailyPayments);
     }
 
-    private PaymentResponse convertToResponse(DailyPayments dailyPayments) {
-        return new PaymentResponse(
-                dailyPayments.getId(),
+    private DailyPaymentResponse convertToResponse(DailyPayments dailyPayments) {
+        return new DailyPaymentResponse(
+                dailyPayments.getDailyPaymentsId(),
                 dailyPayments.getDate(),
                 dailyPayments.getTotalAmount(),
                 dailyPayments.getEventType()
         );
     }
 
-    private DailyPayments convertToEntity(PaymentRequest paymentRequest) {
+    private DailyPayments convertToEntity(DailyPaymentRequest dailyPaymentRequest) {
         return new DailyPayments(
                 null,
-                paymentRequest.getDate(),
-                paymentRequest.getTotalAmount(),
-                paymentRequest.getEventType()
+                dailyPaymentRequest.getDate(),
+                dailyPaymentRequest.getTotalAmount(),
+                dailyPaymentRequest.getEventType()
         );
     }
 
@@ -91,4 +96,40 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
     public void deleteById(Long id) {
         dailyPaymentsRepo.deleteById(id);
     }
+
+    @Override
+    public MonthlyPaymentSummaryResponse getMonthlyPaymentSummary(int month, int year) {
+        // Calculate the start and end dates of the specified month and year
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month - 1); // Months in Calendar are zero-based
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        Date startDate = calendar.getTime();
+
+        calendar.add(Calendar.MONTH, 1);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        Date endDate = calendar.getTime();
+
+        // Retrieve payments within the specified month
+        List<DailyPayments> payments = dailyPaymentsRepo.findByDateBetween(startDate, endDate);
+
+        // Calculate the grand total and totals for each meeting type
+        BigDecimal grandTotal = BigDecimal.ZERO;
+        EnumMap<EventType, BigDecimal> meetingTypeTotals = new EnumMap<>(EventType.class);
+        for (DailyPayments payment : payments) {
+            grandTotal = grandTotal.add(payment.getTotalAmount());
+            meetingTypeTotals.put(payment.getEventType(), meetingTypeTotals.getOrDefault(payment.getEventType(), BigDecimal.ZERO).add(payment.getTotalAmount()));
+        }
+
+        // Create the response object
+        MonthlyPaymentSummaryResponse summaryResponse = new MonthlyPaymentSummaryResponse();
+        summaryResponse.setMonth(Month.of(month).name());
+        summaryResponse.setYear(year);
+        summaryResponse.setGrandTotal(grandTotal);
+        summaryResponse.setMeetingTypeTotals(meetingTypeTotals);
+
+        return summaryResponse;
+    }
+
 }

@@ -3,7 +3,7 @@ package com.algomart.kibouregistry.services.impl;
 import com.algomart.kibouregistry.entity.ContactInfo;
 import com.algomart.kibouregistry.entity.Events;
 import com.algomart.kibouregistry.entity.Participants;
-import com.algomart.kibouregistry.entity.response.APIResponse;
+import com.algomart.kibouregistry.models.response.APIResponse;
 import com.algomart.kibouregistry.enums.Category;
 import com.algomart.kibouregistry.repository.EventsRepo;
 import com.algomart.kibouregistry.repository.ParticipantsRepo;

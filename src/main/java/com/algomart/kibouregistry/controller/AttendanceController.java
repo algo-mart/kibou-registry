@@ -2,7 +2,7 @@ package com.algomart.kibouregistry.controller;
 
 import com.algomart.kibouregistry.entity.Attendance;
 import com.algomart.kibouregistry.entity.Participants;
-import com.algomart.kibouregistry.entity.response.APIResponse;
+import com.algomart.kibouregistry.models.response.APIResponse;
 import com.algomart.kibouregistry.exceptions.ResourceNotFoundException;
 import com.algomart.kibouregistry.services.AttendanceService;
 import jakarta.validation.Valid;
