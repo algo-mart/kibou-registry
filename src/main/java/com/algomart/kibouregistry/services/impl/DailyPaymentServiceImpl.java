@@ -1,12 +1,11 @@
 package com.algomart.kibouregistry.services.impl;
-
 import com.algomart.kibouregistry.enums.SearchOperation;
 import com.algomart.kibouregistry.enums.EventType;
 import com.algomart.kibouregistry.exceptions.DailyPaymentNotFoundException;
-import com.algomart.kibouregistry.models.MonthlyPaymentSummaryResponse;
 import com.algomart.kibouregistry.models.DailyPaymentRequest;
 import com.algomart.kibouregistry.models.DailyPaymentResponse;
 import com.algomart.kibouregistry.models.SearchCriteria;
+import com.algomart.kibouregistry.models.response.MonthlyPaymentSummaryResponse;
 import com.algomart.kibouregistry.repository.DailyPaymentsRepo;
 import com.algomart.kibouregistry.entity.DailyPayments;
 import com.algomart.kibouregistry.services.DailyPaymentsService;
@@ -123,13 +122,17 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
         }
 
         // Create the response object
-        MonthlyPaymentSummaryResponse summaryResponse = new MonthlyPaymentSummaryResponse();
-        summaryResponse.setMonth(Month.of(month).name());
-        summaryResponse.setYear(year);
-        summaryResponse.setGrandTotal(grandTotal);
-        summaryResponse.setMeetingTypeTotals(meetingTypeTotals);
+        try {
+            MonthlyPaymentSummaryResponse summaryResponse = new MonthlyPaymentSummaryResponse();
+            summaryResponse.setMonth(Month.of(month).name());
+            summaryResponse.setYear(year);
+            summaryResponse.setGrandTotal(grandTotal);
+            summaryResponse.setMeetingTypeTotals(meetingTypeTotals);
 
-        return summaryResponse;
+            return summaryResponse;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }

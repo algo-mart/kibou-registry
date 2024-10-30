@@ -37,10 +37,6 @@ public class DailyPaymentServiceImplTest {
     @BeforeEach
     void setUp() {
         dailyPaymentRequest = new DailyPaymentRequest(new Date(), BigDecimal.valueOf(100.00), EventType.REGULAR);
-    public void setUp() {
-        paymentRequest = new PaymentRequest(new Date(), BigDecimal.valueOf(100.00), EventType.REGULAR);
-        dailyPayments = new DailyPayments(1L, new Date(), BigDecimal.valueOf(100.00), EventType.REGULAR);
-        dailyPaymentResponse = new DailyPaymentResponse(1L, new Date(), BigDecimal.valueOf(100.00), EventType.REGULAR);
     }
 
     @Test

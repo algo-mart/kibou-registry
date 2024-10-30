@@ -1,9 +1,9 @@
 package com.algomart.kibouregistry.services;
 
 import com.algomart.kibouregistry.enums.EventType;
-import com.algomart.kibouregistry.models.MonthlyPaymentSummaryResponse;
 import com.algomart.kibouregistry.models.DailyPaymentRequest;
 import com.algomart.kibouregistry.models.DailyPaymentResponse;
+import com.algomart.kibouregistry.models.response.MonthlyPaymentSummaryResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

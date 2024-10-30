@@ -1,10 +1,8 @@
 package com.algomart.kibouregistry.controller;
-
-
 import com.algomart.kibouregistry.enums.EventType;
-import com.algomart.kibouregistry.models.MonthlyPaymentSummaryResponse;
 import com.algomart.kibouregistry.models.DailyPaymentRequest;
 import com.algomart.kibouregistry.models.DailyPaymentResponse;
+import com.algomart.kibouregistry.models.response.MonthlyPaymentSummaryResponse;
 import com.algomart.kibouregistry.services.DailyPaymentsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
