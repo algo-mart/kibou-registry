@@ -1,13 +1,18 @@
 package com.algomart.kibouregistry.services.impl;
+import com.algomart.kibouregistry.entity.Participants;
 import com.algomart.kibouregistry.enums.SearchOperation;
 import com.algomart.kibouregistry.enums.EventType;
 import com.algomart.kibouregistry.exceptions.DailyPaymentNotFoundException;
+import com.algomart.kibouregistry.exceptions.EventsNotFoundException;
+import com.algomart.kibouregistry.exceptions.ParticipantNotFoundException;
 import com.algomart.kibouregistry.models.DailyPaymentRequest;
 import com.algomart.kibouregistry.models.DailyPaymentResponse;
 import com.algomart.kibouregistry.models.SearchCriteria;
 import com.algomart.kibouregistry.models.response.MonthlyPaymentSummaryResponse;
 import com.algomart.kibouregistry.repository.DailyPaymentsRepo;
 import com.algomart.kibouregistry.entity.DailyPayments;
+import com.algomart.kibouregistry.repository.EventsRepo;
+import com.algomart.kibouregistry.repository.ParticipantsRepo;
 import com.algomart.kibouregistry.services.DailyPaymentsService;
 import com.algomart.kibouregistry.util.GenericSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +30,16 @@ import java.util.*;
 public class DailyPaymentServiceImpl implements DailyPaymentsService {
     private final DailyPaymentsRepo dailyPaymentsRepo;
 
+    private final EventsRepo eventsRepo;
+
+    private final ParticipantsRepo participantsRepo;
     @Autowired
-    public DailyPaymentServiceImpl(DailyPaymentsRepo dailyPaymentsRepo) {
+    public DailyPaymentServiceImpl(DailyPaymentsRepo dailyPaymentsRepo, EventsRepo eventsRepo, ParticipantsRepo participantsRepo) {
         this.dailyPaymentsRepo = dailyPaymentsRepo;
+        this.eventsRepo = eventsRepo;
+        this.participantsRepo = participantsRepo;
     }
+
 
     public Page<DailyPaymentResponse> findAll(Date startDate, Date endDate, EventType eventType, Pageable pageable) {
         GenericSpecification<DailyPayments> spec = new GenericSpecification<>();
@@ -42,7 +53,7 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
             spec.add(new SearchCriteria("eventType", eventType, SearchOperation.EQUAL));
         }
         Page<DailyPayments> page = dailyPaymentsRepo.findAll(spec, pageable);
-        return page.map(this::convertToResponse);
+        return page.map(DailyPaymentResponse::new);
     }
 
     @Override
@@ -50,49 +61,40 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
         DailyPayments dailyPayments = dailyPaymentsRepo.findById(id)
                 .orElseThrow(() -> new DailyPaymentNotFoundException(id));
 
-        return convertToResponse(dailyPayments);
+        return new DailyPaymentResponse(dailyPayments);
     }
 
     @Override
     public DailyPaymentResponse save(DailyPaymentRequest dailyPaymentRequest) {
-        DailyPayments dailyPayments = convertToEntity(dailyPaymentRequest);
-        dailyPayments = dailyPaymentsRepo.save(dailyPayments);
-        return convertToResponse(dailyPayments);
+        DailyPayments dailyPayments = new DailyPayments();
+        var event = eventsRepo.findById(dailyPaymentRequest.getEvent()).get();
+        dailyPayments.setDate(dailyPaymentRequest.getDate());
+        dailyPayments.setTotalAmount(dailyPaymentRequest.getTotalAmount());
+        dailyPayments.setEvent(event);
+       DailyPayments  dailyPayments1 = dailyPaymentsRepo.save(dailyPayments);
+        return new DailyPaymentResponse(dailyPayments1);
     }
 
     @Override
     public DailyPaymentResponse update(Long id, DailyPaymentRequest dailyPaymentRequest) {
         DailyPayments dailyPayments = dailyPaymentsRepo.findById(id)
                 .orElseThrow(() -> new DailyPaymentNotFoundException(id));
+        var event = eventsRepo.findById(dailyPaymentRequest.getEvent()).orElseThrow(
+                () -> new EventsNotFoundException(dailyPaymentRequest.getEvent()));
 
         dailyPayments.setDate(dailyPaymentRequest.getDate());
         dailyPayments.setTotalAmount(dailyPaymentRequest.getTotalAmount());
-        dailyPayments.setEventType(dailyPaymentRequest.getEventType());
+        dailyPayments.setEvent(event);
 
-        dailyPayments = dailyPaymentsRepo.save(dailyPayments);
-        return convertToResponse(dailyPayments);
+       DailyPayments dailyPayments2 = dailyPaymentsRepo.save(dailyPayments);
+        return new DailyPaymentResponse(dailyPayments2);
     }
 
-    private DailyPaymentResponse convertToResponse(DailyPayments dailyPayments) {
-        return new DailyPaymentResponse(
-                dailyPayments.getDailyPaymentsId(),
-                dailyPayments.getDate(),
-                dailyPayments.getTotalAmount(),
-                dailyPayments.getEventType()
-        );
-    }
-
-    private DailyPayments convertToEntity(DailyPaymentRequest dailyPaymentRequest) {
-        return new DailyPayments(
-                null,
-                dailyPaymentRequest.getDate(),
-                dailyPaymentRequest.getTotalAmount(),
-                dailyPaymentRequest.getEventType()
-        );
-    }
 
     @Override
     public void deleteById(Long id) {
+        DailyPayments dailyPayments = dailyPaymentsRepo.findById(id).orElseThrow(() ->
+                new DailyPaymentNotFoundException(id));
         dailyPaymentsRepo.deleteById(id);
     }
 
@@ -118,7 +120,7 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
         EnumMap<EventType, BigDecimal> meetingTypeTotals = new EnumMap<>(EventType.class);
         for (DailyPayments payment : payments) {
             grandTotal = grandTotal.add(payment.getTotalAmount());
-            meetingTypeTotals.put(payment.getEventType(), meetingTypeTotals.getOrDefault(payment.getEventType(), BigDecimal.ZERO).add(payment.getTotalAmount()));
+            meetingTypeTotals.put(payment.getEvent().getEventType(), meetingTypeTotals.getOrDefault(payment.getEvent().getEventType(), BigDecimal.ZERO).add(payment.getTotalAmount()));
         }
 
         // Create the response object
