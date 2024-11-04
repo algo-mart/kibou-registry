@@ -1,7 +1,7 @@
 package com.algomart.kibouregistry.services.impl;
 
 import com.algomart.kibouregistry.entity.Attendance;
-import com.algomart.kibouregistry.entity.response.APIResponse;
+import com.algomart.kibouregistry.models.response.APIResponse;
 import com.algomart.kibouregistry.enums.Category;
 import com.algomart.kibouregistry.enums.EventType;
 import com.algomart.kibouregistry.repository.AttendanceRepo;

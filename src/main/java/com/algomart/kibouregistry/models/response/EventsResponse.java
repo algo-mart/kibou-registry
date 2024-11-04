@@ -1,4 +1,8 @@
-package com.algomart.kibouregistry.entity;
+package com.algomart.kibouregistry.models.response;
+
+import com.algomart.kibouregistry.entity.Attendance;
+import com.algomart.kibouregistry.entity.DailyPayments;
+import com.algomart.kibouregistry.entity.Participants;
 import com.algomart.kibouregistry.enums.EventType;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
@@ -7,27 +11,16 @@ import lombok.*;
 import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
-@Data
-@Entity
+
 @Builder
+@Getter
+@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "events")
-public class Events {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "event_id")
+public class EventsResponse {
     private Long eventId;
-
-    @Column(name = "date")
     private LocalDate date;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "event_type")
-    private EventType eventType;
-
-    @Column(name = "venue")
+    private String eventType;
     private String venue;
-
-
 }

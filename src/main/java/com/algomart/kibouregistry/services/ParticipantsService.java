@@ -1,7 +1,7 @@
 package com.algomart.kibouregistry.services;
 
 import com.algomart.kibouregistry.entity.Participants;
-import com.algomart.kibouregistry.entity.response.APIResponse;
+import com.algomart.kibouregistry.models.response.APIResponse;
 
 public interface ParticipantsService {
 

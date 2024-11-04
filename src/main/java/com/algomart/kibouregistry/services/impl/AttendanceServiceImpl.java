@@ -1,17 +1,24 @@
 package com.algomart.kibouregistry.services.impl;
 
 import com.algomart.kibouregistry.entity.Attendance;
+import com.algomart.kibouregistry.entity.Events;
 import com.algomart.kibouregistry.entity.Participants;
-import com.algomart.kibouregistry.entity.response.APIResponse;
+import com.algomart.kibouregistry.enums.SearchOperation;
+import com.algomart.kibouregistry.exceptions.EventsNotFoundException;
+import com.algomart.kibouregistry.models.SearchCriteria;
+import com.algomart.kibouregistry.models.request.AttendanceRequest;
+import com.algomart.kibouregistry.models.response.APIResponse;
 import com.algomart.kibouregistry.exceptions.ResourceNotFoundException;
+import com.algomart.kibouregistry.models.response.AttendanceResponse;
+import com.algomart.kibouregistry.models.response.EventsResponse;
 import com.algomart.kibouregistry.repository.AttendanceRepo;
 import com.algomart.kibouregistry.repository.ParticipantsRepo;
 import com.algomart.kibouregistry.services.AttendanceService;
+import com.algomart.kibouregistry.util.GenericSpecification;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -26,61 +33,36 @@ public class AttendanceServiceImpl implements AttendanceService {
     private final ParticipantsRepo participantsRepo;
 
     @Override
-    public APIResponse recordAttendance(Attendance attendance) {
-        if (attendance != null && attendance.getParticipantId() != null) {
-            Optional<Participants> optionalParticipant = participantsRepo.findById(attendance.getParticipantId().getParticipantId());
-
-            if (optionalParticipant.isPresent()) {
-                Participants participant = optionalParticipant.get();
-
-                attendance.setParticipantId(participant);
-                attendanceRepo.save(attendance);
-
-                return APIResponse.builder()
-                        .status("Success")
-                        .message("Attendance recorded successfully")
-                        .data(attendance)
-                        .build();
-            } else {
-                return APIResponse.builder()
-                        .status("Failed")
-                        .message("Participant cannot be found")
-                        .build();
-            }
-        } else {
-            return APIResponse.builder()
-                    .status("Failed")
-                    .message("Invalid attendance record: Participant ID is null")
-                    .build();
-        }
+    public AttendanceResponse recordAttendance(AttendanceRequest attendance) {
+        Attendance newAttendance = new Attendance();
+        Participants participant = participantsRepo.findById(attendance.getParticipantId().getParticipantId())
+                .orElseThrow(() -> new IllegalArgumentException("Participant with ID " + attendance.getParticipantId() + " does not exist."));
+        newAttendance.setParticipantId(attendance.getParticipantId());
+        newAttendance.setDate(attendance.getDate());
+        newAttendance.setStatus(attendance.getStatus());
+        var saveAttendance = attendanceRepo.save(newAttendance);
+        return AttendanceResponse.builder()
+                .attendanceId(saveAttendance.getAttendanceId())
+                .participantId(attendance.getParticipantId())
+                .date(saveAttendance.getDate())
+                .status(saveAttendance.getStatus())
+                .build();
     }
 
 
     @Override
-    public APIResponse getAllAttendance(int pageSize, int pageNumber) {
-        try {
-            Pageable pageable = PageRequest.of(pageNumber, pageSize, Sort.by("date").descending());
-
-            Page<Attendance> attendancePage = attendanceRepo.findAll(pageable);
-
-            if (attendancePage.isEmpty()) {
-                return APIResponse.builder()
-                        .status("Failed")
-                        .message("No attendance records found.")
-                        .build();
-            }
-
-            return APIResponse.builder()
-                    .status("Success")
-                    .message("Attendance records retrieved successfully")
-                    .data(attendancePage.getContent())
-                    .build();
-        } catch (ResourceNotFoundException e) {
-            return APIResponse.builder()
-                    .status("Failed")
-                    .message("Error retrieving attendance records: " + e.getMessage())
-                    .build();
+    public Page<AttendanceResponse> getAllAttendance(int pageSize, int pageNumber, String status) {
+        GenericSpecification<Attendance> spec = new GenericSpecification<>();
+        if (status != null) {
+            spec.add(new SearchCriteria("status", status, SearchOperation.EQUAL));
         }
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        Page<Attendance> searchResult = attendanceRepo.findAll(spec, pageable);
+        List<AttendanceResponse> responses = searchResult.getContent().stream()
+                .map(response -> new AttendanceResponse(response.getAttendanceId(), response.getParticipantId(),
+                        response.getDate(), response.getStatus()))
+                .toList();
+        return new PageImpl<>(responses, pageable, searchResult.getTotalElements());
     }
 
     @Override
@@ -102,53 +84,38 @@ public class AttendanceServiceImpl implements AttendanceService {
     }
 
     @Override
-    public APIResponse updateAttendance(Long id, Attendance attendance) {
-        try {
-            Optional<Attendance> optionalAttendance = attendanceRepo.findById(id);
+    public AttendanceResponse updateAttendance(Long id, AttendanceRequest attendance) {
+        Attendance attendance1 = attendanceRepo.findById(id).
+                orElseThrow(() -> new ResourceNotFoundException());
+        attendance1.setParticipantId(attendance.getParticipantId());
+        attendance1.setDate(attendance.getDate());
+        attendance1.setStatus(attendance.getStatus());
 
-            if (optionalAttendance.isPresent()) {
-                Attendance existingAttendance = optionalAttendance.get();
-
-                existingAttendance.setDate(attendance.getDate());
-                existingAttendance.setStatus(attendance.getStatus());
-
-                attendanceRepo.save(existingAttendance);
-
-                return APIResponse.builder()
-                        .status("Success")
-                        .message("Attendance record updated successfully")
-                        .data(existingAttendance)
-                        .build();
-            } else {
-                return APIResponse.builder()
-                        .status("Failed")
-                        .message("Attendance does not exist")
-                        .build();
-            }
-        } catch (ResourceNotFoundException ex) {
-            return APIResponse.builder()
-                    .status("Failed")
-                    .message("Error updating attendance record: " + ex.getMessage())
-                    .build();
-        }
+        var newAttendance = attendanceRepo.save(attendance1);
+        return AttendanceResponse.builder()
+                .attendanceId(newAttendance.getAttendanceId())
+                .participantId(newAttendance.getParticipantId())
+                .date(newAttendance.getDate())
+                .status(newAttendance.getStatus())
+                .build();
     }
 
     @Override
-    public APIResponse deleteAttendance(Long id) {
-        try {
-            if (!attendanceRepo.existsById(id)) {
-                throw new ResourceNotFoundException();
-            }
-            attendanceRepo.deleteById(id);
-            return APIResponse.builder()
-                    .status("Success")
-                    .message("Attendance record deleted successfully")
-                    .build();
-        } catch (ResourceNotFoundException ex) {
-            return APIResponse.builder()
-                    .status("Failed")
-                    .message("Attendance does not exist")
-                    .build();
-        }
+    public void deleteAttendance(Long id) {
+        attendanceRepo.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException());
+        attendanceRepo.deleteById(id);
+    }
+
+    @Override
+    public AttendanceResponse getAttendanceById(Long id) {
+        Attendance attendance = attendanceRepo.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException());
+        return AttendanceResponse.builder().
+                attendanceId(attendance.getAttendanceId())
+                .participantId(attendance.getParticipantId())
+                .date(attendance.getDate())
+                .status(attendance.getStatus())
+                . build();
     }
 }

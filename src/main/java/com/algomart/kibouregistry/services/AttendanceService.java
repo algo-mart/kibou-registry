@@ -2,18 +2,23 @@ package com.algomart.kibouregistry.services;
 
 import com.algomart.kibouregistry.entity.Attendance;
 import com.algomart.kibouregistry.entity.Participants;
-import com.algomart.kibouregistry.entity.response.APIResponse;
+import com.algomart.kibouregistry.models.request.AttendanceRequest;
+import com.algomart.kibouregistry.models.response.APIResponse;
+import com.algomart.kibouregistry.models.response.AttendanceResponse;
+import org.springframework.data.domain.Page;
 
 public interface AttendanceService {
 
-    APIResponse recordAttendance(Attendance attendance);
+    AttendanceResponse recordAttendance(AttendanceRequest attendance);
 
-    APIResponse getAllAttendance(int pageSize, int pageNumber);
+    Page<AttendanceResponse> getAllAttendance(int pageSize, int pageNumber, String status);
 
     APIResponse getAttendanceByParticipantId(Participants participantId);
 
-    APIResponse updateAttendance(Long id, Attendance attendance);
+    AttendanceResponse updateAttendance(Long id, AttendanceRequest attendance);
 
-    APIResponse deleteAttendance(Long id);
+    void deleteAttendance(Long id);
+
+    AttendanceResponse getAttendanceById (Long id);
 
 }
