@@ -1,9 +1,0 @@
-#!/bin/sh
-
-# Regex to validate the commit message format
-COMMIT_REGEX='^(feat|chore|test|fix|perf):'
-
-if ! grep -qE "$COMMIT_REGEX" "$1"; then
-  echo "ERROR: Commit message does not start with 'feat:', 'chore:', 'test:', 'fix:', or 'perf:'"
-  exit 1
-fi
