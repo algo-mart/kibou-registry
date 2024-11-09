@@ -7,10 +7,10 @@ services:
     ports:
       - "9000:9000"
     environment:
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
-      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_URL: jdbc:postgresql://dpg-csebrfe8ii6s7390h890-a.oregon-postgres.render.com:5432/kibou_database
+      SPRING_DATASOURCE_USERNAME: kibou_database_user
       POSTGRES_HOST: db
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-default_password}
+      POSTGRES_PASSWORD: JttlY3OdlupXJ4hWmqkwyqaaWiYP6vsV
       POSTGRES_USER: ${POSTGRES_USER:-default_user}
       POSTGRES_PORT: ${POSTGRES_PORT:-5432}
     depends_on:
