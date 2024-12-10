@@ -19,11 +19,6 @@ public class EventsSeeder {
     @Autowired
     private EventsServiceImpl eventsService;
 
-
-
-
-
-
     @PostConstruct
     public void seedEvents() {
         createRegularEvent();
