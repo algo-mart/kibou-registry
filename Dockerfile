@@ -16,6 +16,9 @@ COPY src ./src
 # Install dependencies and build the application
 RUN mvn clean package -DskipTests
 
+# Debug: List the contents of the target directory to verify the JAR file exists
+RUN ls -la /app/target
+
 # Ensure the target directory exists
 RUN mkdir -p /app/target
 
