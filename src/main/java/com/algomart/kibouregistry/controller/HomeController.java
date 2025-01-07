@@ -9,8 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class HomeController {
 
     @GetMapping
-    public ResponseEntity<String> HomeController(){
+    public ResponseEntity<String> getHomeMessage() {
         return new ResponseEntity<>("Welcome to Kibou-Project", HttpStatus.OK);
-
     }
 }
