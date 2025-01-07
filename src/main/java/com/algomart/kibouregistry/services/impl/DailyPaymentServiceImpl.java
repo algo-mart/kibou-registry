@@ -3,6 +3,7 @@ package com.algomart.kibouregistry.services.impl;
 import com.algomart.kibouregistry.enums.SearchOperation;
 import com.algomart.kibouregistry.enums.EventType;
 import com.algomart.kibouregistry.exceptions.PaymentNotFoundException;
+import com.algomart.kibouregistry.models.MonthlyPaymentSummaryResponse;
 import com.algomart.kibouregistry.models.PaymentRequest;
 import com.algomart.kibouregistry.models.PaymentResponse;
 import com.algomart.kibouregistry.models.SearchCriteria;
@@ -15,7 +16,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
+
+import java.math.BigDecimal;
+import java.time.Month;
+import java.util.*;
+
 
 @Service
 public class DailyPaymentServiceImpl implements DailyPaymentsService {
@@ -91,4 +96,40 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
     public void deleteById(Long id) {
         dailyPaymentsRepo.deleteById(id);
     }
+
+    @Override
+    public MonthlyPaymentSummaryResponse getMonthlyPaymentSummary(int month, int year) {
+        // Calculate the start and end dates of the specified month and year
+        Calendar calendar = Calendar.getInstance();
+        calendar.clear();
+        calendar.set(Calendar.YEAR, year);
+        calendar.set(Calendar.MONTH, month - 1); // Months in Calendar are zero-based
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        Date startDate = calendar.getTime();
+
+        calendar.add(Calendar.MONTH, 1);
+        calendar.add(Calendar.DAY_OF_MONTH, -1);
+        Date endDate = calendar.getTime();
+
+        // Retrieve payments within the specified month
+        List<DailyPayments> payments = dailyPaymentsRepo.findByDateBetween(startDate, endDate);
+
+        // Calculate the grand total and totals for each meeting type
+        BigDecimal grandTotal = BigDecimal.ZERO;
+        EnumMap<EventType, BigDecimal> meetingTypeTotals = new EnumMap<>(EventType.class);
+        for (DailyPayments payment : payments) {
+            grandTotal = grandTotal.add(payment.getTotalAmount());
+            meetingTypeTotals.put(payment.getEventType(), meetingTypeTotals.getOrDefault(payment.getEventType(), BigDecimal.ZERO).add(payment.getTotalAmount()));
+        }
+
+        // Create the response object
+        MonthlyPaymentSummaryResponse summaryResponse = new MonthlyPaymentSummaryResponse();
+        summaryResponse.setMonth(Month.of(month).name());
+        summaryResponse.setYear(year);
+        summaryResponse.setGrandTotal(grandTotal);
+        summaryResponse.setMeetingTypeTotals(meetingTypeTotals);
+
+        return summaryResponse;
+    }
+
 }
