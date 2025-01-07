@@ -1,7 +1,10 @@
 FROM openjdk:17-oracle
 
-# Install Maven
-RUN apt-get update && apt-get install -y maven
+# Install Maven by downloading and extracting it
+RUN curl -fsSL https://archive.apache.org/dist/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz -o maven.tar.gz && \
+    tar -xzf maven.tar.gz -C /opt && \
+    rm maven.tar.gz && \
+    ln -s /opt/apache-maven-3.8.6/bin/mvn /usr/bin/mvn
 
 # Set the working directory inside the container
 WORKDIR /app
