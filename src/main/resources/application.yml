@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/kibou_db}
-    username: ${SPRING_DATASOURCE_USERNAME:${POSTGRES_USER:olusolaalao}}
-    password: ${SPRING_DATASOURCE_PASSWORD:${POSTGRES_PASSWORD:1234}}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://dpg-ctue7abqf0us73f384ag-a.oregon-postgres.render.com:5432/kibou_db}
+    username: ${SPRING_DATASOURCE_USERNAME:kibou_db_user}
+    password: ${SPRING_DATASOURCE_PASSWORD:AsvvNkaxwoNpis9C6OXzqQv9BgbQcRAO}
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
