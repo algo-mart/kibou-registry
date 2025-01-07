@@ -20,8 +20,7 @@ RUN mvn clean package -DskipTests
 RUN ls -la /app/target
 
 # Ensure the target directory exists and copy the .jar file into the container
-RUN mkdir -p /app/target
-COPY ./target/kibou-registry.jar /app/kibou-registry.jar
+COPY target/kibou-registry.jar /app/kibou-registry.jar
 
 EXPOSE 9000
 
