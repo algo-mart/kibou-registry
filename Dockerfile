@@ -1,5 +1,8 @@
 FROM openjdk:17-oracle
 
+# Install Maven
+RUN apt-get update && apt-get install -y maven
+
 # Set the working directory inside the container
 WORKDIR /app
 
