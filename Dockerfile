@@ -1,30 +1,27 @@
-FROM openjdk:17-oracle
-
-# Install Maven by downloading and extracting it
-RUN curl -fsSL https://archive.apache.org/dist/maven/maven-3/3.8.6/binaries/apache-maven-3.8.6-bin.tar.gz -o maven.tar.gz && \
-    tar -xzf maven.tar.gz -C /opt && \
-    rm maven.tar.gz && \
-    ln -s /opt/apache-maven-3.8.6/bin/mvn /usr/bin/mvn
+# Stage 1: Build the application
+FROM maven:3.8.5-openjdk-17 AS build
 
 # Set the working directory inside the container
-WORKDIR /app
+WORKDIR /usr/src/kibou-registry
 
-# Copy the pom.xml and the source files to the container
+# Copy the pom.xml and source files
 COPY pom.xml .
 COPY src ./src
 
-# Install dependencies and build the application
+# Build the project and create the .jar file
 RUN mvn clean package -DskipTests
 
-# Debug: List the contents of the target directory to verify the JAR file exists
-RUN ls -la /app/target
+# Stage 2: Create the final image
+FROM openjdk:17-jdk-slim
 
-# Ensure target/kibou-registry.jar is there before trying to copy
-RUN if [ ! -f /app/target/kibou-registry.jar ]; then echo "JAR file not found!" && exit 1; fi
+# Set the working directory inside the final image
+WORKDIR /kibou-registry
 
-# Copy the .jar file into the container
-COPY ./target/kibou-registry.jar /app/kibou-registry.jar
+# Copy the .jar file from the build stage
+COPY --from=build /usr/src/kibou-registry/target/kibou-registry.jar ./kibou-registry.jar
 
+# Expose the required port (adjust if necessary)
 EXPOSE 9000
 
-ENTRYPOINT ["java", "-jar", "/app/kibou-registry.jar"]
+# Run the application
+ENTRYPOINT ["java", "-jar", "kibou-registry.jar"]
