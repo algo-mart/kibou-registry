@@ -16,6 +16,9 @@ COPY src ./src
 # Install dependencies and build the application
 RUN mvn clean package -DskipTests
 
+# Ensure the target directory exists
+RUN mkdir -p /app/target
+
 # Copy the built .jar file to the container
 COPY target/*.jar kibou-registry.jar
 
