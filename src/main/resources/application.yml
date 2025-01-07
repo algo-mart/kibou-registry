@@ -1,8 +1,8 @@
 spring:
   datasource:
-      url: ${db_url}
-      username: ${db_username}
-      password: ${db_password}
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://dpg-ctue7abqf0us73f384ag-a.oregon-postgres.render.com:5432/kibou_db}
+    username: ${db_username}
+    password: ${db_password}
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
