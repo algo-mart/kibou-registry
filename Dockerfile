@@ -19,11 +19,9 @@ RUN mvn clean package -DskipTests
 # Debug: List the contents of the target directory to verify the JAR file exists
 RUN ls -la /app/target
 
-# Ensure the target directory exists
+# Ensure the target directory exists and copy the .jar file into the container
 RUN mkdir -p /app/target
-
-# Copy the built .jar file to the container
-COPY target/*.jar kibou-registry.jar
+COPY target/kibou-registry.jar kibou-registry.jar
 
 EXPOSE 9000
 
