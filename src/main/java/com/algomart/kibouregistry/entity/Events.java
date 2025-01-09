@@ -1,12 +1,8 @@
 package com.algomart.kibouregistry.entity;
 import com.algomart.kibouregistry.enums.EventType;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
-
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.List;
 @Data
 @Entity
 @Builder

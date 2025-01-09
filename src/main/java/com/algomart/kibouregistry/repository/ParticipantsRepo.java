@@ -1,8 +1,8 @@
 package com.algomart.kibouregistry.repository;
-
 import com.algomart.kibouregistry.entity.Participants;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-public interface ParticipantsRepo extends JpaRepository<Participants, Long> {
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import java.util.List;
+public interface ParticipantsRepo extends JpaRepository<Participants, Long> , JpaSpecificationExecutor<Participants> {
     Participants findByContactInfoEmail(String email);
 }

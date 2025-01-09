@@ -1,14 +1,11 @@
 package com.algomart.kibouregistry.entity;
-
 import com.algomart.kibouregistry.enums.AttendanceStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.time.LocalDate;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,7 +20,11 @@ public class Attendance {
 
     @ManyToOne
     @JoinColumn(name = "participant_id", nullable = false)
-    private Participants participantId;
+    private Participants participant;
+
+    @ManyToOne
+    @JoinColumn(name = "event_id", nullable = false)
+    private Events event;
 
     @Column(name = "date")
     private LocalDate date;

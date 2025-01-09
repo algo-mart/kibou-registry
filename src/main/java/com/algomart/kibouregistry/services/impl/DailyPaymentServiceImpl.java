@@ -1,12 +1,10 @@
 package com.algomart.kibouregistry.services.impl;
-import com.algomart.kibouregistry.entity.Participants;
 import com.algomart.kibouregistry.enums.SearchOperation;
 import com.algomart.kibouregistry.enums.EventType;
 import com.algomart.kibouregistry.exceptions.DailyPaymentNotFoundException;
 import com.algomart.kibouregistry.exceptions.EventsNotFoundException;
-import com.algomart.kibouregistry.exceptions.ParticipantNotFoundException;
-import com.algomart.kibouregistry.models.DailyPaymentRequest;
-import com.algomart.kibouregistry.models.DailyPaymentResponse;
+import com.algomart.kibouregistry.models.request.DailyPaymentRequest;
+import com.algomart.kibouregistry.models.response.DailyPaymentResponse;
 import com.algomart.kibouregistry.models.SearchCriteria;
 import com.algomart.kibouregistry.models.response.MonthlyPaymentSummaryResponse;
 import com.algomart.kibouregistry.repository.DailyPaymentsRepo;
@@ -19,28 +17,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-
 import java.math.BigDecimal;
 import java.time.Month;
 import java.util.*;
-
-
 @Service
 public class DailyPaymentServiceImpl implements DailyPaymentsService {
     private final DailyPaymentsRepo dailyPaymentsRepo;
 
     private final EventsRepo eventsRepo;
 
-    private final ParticipantsRepo participantsRepo;
     @Autowired
-    public DailyPaymentServiceImpl(DailyPaymentsRepo dailyPaymentsRepo, EventsRepo eventsRepo, ParticipantsRepo participantsRepo) {
+    public DailyPaymentServiceImpl(DailyPaymentsRepo dailyPaymentsRepo, EventsRepo eventsRepo) {
         this.dailyPaymentsRepo = dailyPaymentsRepo;
         this.eventsRepo = eventsRepo;
-        this.participantsRepo = participantsRepo;
     }
-
-
     public Page<DailyPaymentResponse> findAll(Date startDate, Date endDate, EventType eventType, Pageable pageable) {
         GenericSpecification<DailyPayments> spec = new GenericSpecification<>();
         if (startDate != null) {
@@ -89,15 +79,12 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
        DailyPayments dailyPayments2 = dailyPaymentsRepo.save(dailyPayments);
         return new DailyPaymentResponse(dailyPayments2);
     }
-
-
     @Override
     public void deleteById(Long id) {
         DailyPayments dailyPayments = dailyPaymentsRepo.findById(id).orElseThrow(() ->
                 new DailyPaymentNotFoundException(id));
         dailyPaymentsRepo.deleteById(id);
     }
-
     @Override
     public MonthlyPaymentSummaryResponse getMonthlyPaymentSummary(int month, int year) {
         // Calculate the start and end dates of the specified month and year
@@ -122,7 +109,6 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
             grandTotal = grandTotal.add(payment.getTotalAmount());
             meetingTypeTotals.put(payment.getEvent().getEventType(), meetingTypeTotals.getOrDefault(payment.getEvent().getEventType(), BigDecimal.ZERO).add(payment.getTotalAmount()));
         }
-
         // Create the response object
         try {
             MonthlyPaymentSummaryResponse summaryResponse = new MonthlyPaymentSummaryResponse();
@@ -136,5 +122,4 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
             throw new RuntimeException(e);
         }
     }
-
 }

@@ -1,5 +1,4 @@
 package com.algomart.kibouregistry.entity;
-
 import com.algomart.kibouregistry.enums.Category;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,9 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.List;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -34,19 +31,23 @@ public class Participants {
     @Column(name = "category")
     private Category category;
 
-    @ManyToOne
-    @JoinColumn(name = "event_id")
-    private Events event;
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(
+            name = "event_participants",
+            joinColumns = @JoinColumn(name = "participant_id"),
+            inverseJoinColumns = @JoinColumn(name = "event_id")
+    )
+    private List<Events> events;
 
-    @OneToMany(mappedBy = "participantId", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Attendance> attendanceList;
 
-    @ManyToMany(cascade = { CascadeType.ALL })
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
             name = "participant_notifications",
-            joinColumns = { @JoinColumn(name = "participant_id") },
-            inverseJoinColumns = { @JoinColumn(name = "notification_id") }
+            joinColumns = @JoinColumn(name = "participant_id"),
+            inverseJoinColumns = @JoinColumn(name = "notification_id")
     )
     private List<Notifications> notificationList;
 
@@ -57,5 +58,4 @@ public class Participants {
     public Participants(Long participantId) {
         this.participantId = participantId;
     }
-
 }

@@ -1,15 +1,8 @@
-package com.algomart.kibouregistry.models;
-
-import com.algomart.kibouregistry.entity.Events;
-import com.algomart.kibouregistry.entity.Participants;
-import com.algomart.kibouregistry.enums.EventType;
+package com.algomart.kibouregistry.models.request;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-
 import java.math.BigDecimal;
 import java.util.Date;
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 public class DailyPaymentRequest {
