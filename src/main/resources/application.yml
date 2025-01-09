@@ -20,3 +20,4 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.type: TRACE
+    org.hibernate.orm.jdbc.bind: TRACE

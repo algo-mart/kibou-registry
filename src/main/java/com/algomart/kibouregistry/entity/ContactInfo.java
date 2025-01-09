@@ -1,5 +1,4 @@
 package com.algomart.kibouregistry.entity;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -9,7 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -35,6 +33,4 @@ public class ContactInfo {
     @NotBlank(message = "Address is required")
     @Size(min = 5, max = 100, message = "Address must be between 5 and 100 characters")
     private String address;
-
-
 }

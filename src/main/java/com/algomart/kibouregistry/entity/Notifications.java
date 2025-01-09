@@ -1,5 +1,4 @@
 package com.algomart.kibouregistry.entity;
-
 import com.algomart.kibouregistry.enums.NotificationStatus;
 import com.algomart.kibouregistry.enums.NotificationType;
 import jakarta.persistence.*;
@@ -7,7 +6,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 import java.util.Date;
 import java.util.List;
 
