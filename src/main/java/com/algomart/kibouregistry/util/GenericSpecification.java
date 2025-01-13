@@ -1,5 +1,4 @@
 package com.algomart.kibouregistry.util;
-
 import com.algomart.kibouregistry.models.SearchCriteria;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Predicate;
@@ -9,17 +8,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GenericSpecification<T> implements Specification<T> {
-
     private final List<SearchCriteria> criteriaList;
-
     public GenericSpecification() {
         this.criteriaList = new ArrayList<>();
     }
-
     public void add(SearchCriteria criteria) {
         criteriaList.add(criteria);
     }
-
     @Override
     public Predicate toPredicate(Root<T> root, jakarta.persistence.criteria.CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
         List<Predicate> predicates = new ArrayList<>();

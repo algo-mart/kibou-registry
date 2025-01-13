@@ -1,12 +1,13 @@
 package com.algomart.kibouregistry.entity;
 import com.algomart.kibouregistry.enums.EventType;
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDate;
 @Data
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "events")
 public class Events {
     @Id
@@ -15,7 +16,7 @@ public class Events {
     private Long eventId;
 
     @Column(name = "date")
-    private Date date;
+    private LocalDate date;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "event_type")
@@ -24,15 +25,5 @@ public class Events {
     @Column(name = "venue")
     private String venue;
 
-    @OneToOne
-    @JoinColumn(name = "payment_id")
-    private Payments payment;
 
-    @OneToOne
-    @JoinColumn(name = "attendance_id")
-    private Attendance attendance;
-
-    @OneToMany(mappedBy = "event", cascade = CascadeType.ALL)
-    @JsonBackReference
-    private List<Participants> participants;
 }
