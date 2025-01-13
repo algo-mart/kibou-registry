@@ -10,6 +10,7 @@ public class ParticipantRequest {
     private String name;
     private Category category;
 
+
     @Valid
     @NotNull(message = "Contact information is required")
     @JsonProperty("contact_info")
