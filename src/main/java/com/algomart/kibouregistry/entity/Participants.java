@@ -53,6 +53,7 @@ public class Participants {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JsonProperty("contact_info")
+    @NotNull(message = "Contact information is required")
     private ContactInfo contactInfo;
 
     public Participants(Long participantId) {
