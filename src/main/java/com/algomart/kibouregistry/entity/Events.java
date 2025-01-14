@@ -1,5 +1,6 @@
 package com.algomart.kibouregistry.entity;
 import com.algomart.kibouregistry.enums.EventType;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDate;
@@ -15,6 +16,7 @@ public class Events {
     @Column(name = "event_id")
     private Long eventId;
 
+    @JsonFormat(pattern = "yyyy-MM-dd")
     @Column(name = "date")
     private LocalDate date;
 
