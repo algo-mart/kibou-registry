@@ -5,6 +5,8 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
+import lombok.Data;
+
 @Data
 public class SearchCriteria {
     private String key;
