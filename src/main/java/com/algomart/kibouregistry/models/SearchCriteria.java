@@ -1,6 +1,10 @@
 package com.algomart.kibouregistry.models;
 import com.algomart.kibouregistry.enums.SearchOperation;
-import lombok.Data;
+import lombok.*;
+
+@Getter
+@Setter
+@NoArgsConstructor
 @Data
 public class SearchCriteria {
     private String key;
