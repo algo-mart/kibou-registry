@@ -24,7 +24,6 @@ public class DailyPaymentController {
     }
 
     @GetMapping
-    
     public ResponseEntity<Page<DailyPaymentResponse>> findAll(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,

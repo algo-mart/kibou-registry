@@ -40,7 +40,7 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
             spec.add(new SearchCriteria("date", endDate, SearchOperation.LESS_THAN));
         }
         if (eventType != null) {
-            spec.add(new SearchCriteria("eventType", eventType, SearchOperation.EQUAL));
+            spec.add(new SearchCriteria("event.eventType", eventType, SearchOperation.EQUAL));
         }
         Page<DailyPayments> page = dailyPaymentsRepo.findAll(spec, pageable);
         return page.map(DailyPaymentResponse::new);

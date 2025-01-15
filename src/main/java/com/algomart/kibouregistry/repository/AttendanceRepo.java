@@ -9,7 +9,9 @@ import java.time.LocalDate;
 import java.util.List;
 @Repository
 public interface AttendanceRepo extends JpaRepository<Attendance, Long> , JpaSpecificationExecutor<Attendance> {
-   @Query("SELECT a FROM Attendance a WHERE MONTH(a.date) = MONTH(:startDate) AND YEAR(a.date) = YEAR(:startDate) AND DAY(a.date) <= DAY(:endDate)")
+    @Query("SELECT a FROM Attendance a WHERE "
+            + "EXTRACT(MONTH FROM a.date) = EXTRACT(MONTH FROM CAST(:startDate AS DATE)) AND "
+            + "EXTRACT(YEAR FROM a.date) = EXTRACT(YEAR FROM CAST(:startDate AS DATE)) AND "
+            + "EXTRACT(DAY FROM a.date) <= EXTRACT(DAY FROM CAST(:endDate AS DATE))")
     List<Attendance> findByDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
-
 }
