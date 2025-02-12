@@ -1,8 +1,10 @@
 package com.algomart.kibouregistry.services.impl;
+import com.algomart.kibouregistry.entity.Participants;
 import com.algomart.kibouregistry.enums.SearchOperation;
 import com.algomart.kibouregistry.enums.EventType;
 import com.algomart.kibouregistry.exceptions.DailyPaymentNotFoundException;
 import com.algomart.kibouregistry.exceptions.EventsNotFoundException;
+import com.algomart.kibouregistry.exceptions.ParticipantNotFoundException;
 import com.algomart.kibouregistry.models.request.DailyPaymentRequest;
 import com.algomart.kibouregistry.models.response.DailyPaymentResponse;
 import com.algomart.kibouregistry.models.SearchCriteria;
@@ -26,10 +28,13 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
 
     private final EventsRepo eventsRepo;
 
+    private final ParticipantsRepo participantsRepo;
+
     @Autowired
-    public DailyPaymentServiceImpl(DailyPaymentsRepo dailyPaymentsRepo, EventsRepo eventsRepo) {
+    public DailyPaymentServiceImpl(DailyPaymentsRepo dailyPaymentsRepo, EventsRepo eventsRepo, ParticipantsRepo participantsRepo) {
         this.dailyPaymentsRepo = dailyPaymentsRepo;
         this.eventsRepo = eventsRepo;
+        this.participantsRepo = participantsRepo;
     }
     public Page<DailyPaymentResponse> findAll(Date startDate, Date endDate, EventType eventType, Pageable pageable) {
         GenericSpecification<DailyPayments> spec = new GenericSpecification<>();
@@ -47,6 +52,15 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
     }
 
     @Override
+    public Page<DailyPaymentResponse> findAllSortedByEventType(Pageable pageable) {
+
+        Page<DailyPayments> page = dailyPaymentsRepo.findAll((root, query, criteriaBuilder) -> {
+            // Sorting by eventType inside the event relation
+            return query.orderBy(criteriaBuilder.asc(root.get("event").get("eventType"))).getRestriction();
+        }, pageable);
+        return page.map(DailyPaymentResponse::new);
+    }
+    @Override
     public DailyPaymentResponse findById(Long id) {
         DailyPayments dailyPayments = dailyPaymentsRepo.findById(id)
                 .orElseThrow(() -> new DailyPaymentNotFoundException(id));
@@ -56,13 +70,30 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
 
     @Override
     public DailyPaymentResponse save(DailyPaymentRequest dailyPaymentRequest) {
+        if (dailyPaymentRequest.getEvent() == null) {
+            throw new IllegalArgumentException("Event ID must not be null");
+        }
+
+        var event = eventsRepo.findById(dailyPaymentRequest.getEvent())
+                .orElseThrow(() -> new EventsNotFoundException(dailyPaymentRequest.getEvent()));
+
+        EventType eventType = event.getEventType();
+
+        if (dailyPaymentRequest.getParticipantId() == null) {
+            throw new IllegalArgumentException("Participant ID must not be null");
+        }
+
+        Participants participant = participantsRepo.findById(dailyPaymentRequest.getParticipantId())
+                .orElseThrow(() -> new ParticipantNotFoundException(dailyPaymentRequest.getParticipantId()));
+
         DailyPayments dailyPayments = new DailyPayments();
-        var event = eventsRepo.findById(dailyPaymentRequest.getEvent()).get();
         dailyPayments.setDate(dailyPaymentRequest.getDate());
         dailyPayments.setTotalAmount(dailyPaymentRequest.getTotalAmount());
-        dailyPayments.setEvent(event);
-       DailyPayments  dailyPayments1 = dailyPaymentsRepo.save(dailyPayments);
-        return new DailyPaymentResponse(dailyPayments1);
+        dailyPayments.setEventType(eventType);
+        dailyPayments.setParticipants(Collections.singletonList(participant));
+
+        DailyPayments savedPayment = dailyPaymentsRepo.save(dailyPayments);
+        return new DailyPaymentResponse(savedPayment);
     }
 
     @Override

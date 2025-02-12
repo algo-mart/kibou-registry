@@ -13,4 +13,5 @@ public class MonthlyPaymentSummaryResponse {
     private int year;
     private BigDecimal grandTotal;
     private EnumMap<EventType, BigDecimal> meetingTypeTotals;
+    private EnumMap<EventType, BigDecimal> eventTypeTotals;
 }

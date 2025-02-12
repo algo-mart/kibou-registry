@@ -1,4 +1,5 @@
 package com.algomart.kibouregistry.entity;
+import com.algomart.kibouregistry.enums.EventType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +25,10 @@ public class DailyPayments {
 
     @Column(name = "total_amount")
     private BigDecimal totalAmount;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "event_type")
+    private EventType eventType;
 
     @ManyToOne
     @JoinColumn(name = "event_id")

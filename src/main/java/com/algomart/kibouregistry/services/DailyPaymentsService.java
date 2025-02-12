@@ -9,6 +9,8 @@ import java.util.Date;
 public interface DailyPaymentsService {
     Page<DailyPaymentResponse> findAll(Date startDate, Date endDate, EventType eventType, Pageable pageable);
 
+    Page<DailyPaymentResponse> findAllSortedByEventType(Pageable pageable);
+
     DailyPaymentResponse findById(Long theId);
     void deleteById(Long theId);
 
