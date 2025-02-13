@@ -1,5 +1,6 @@
 package com.algomart.kibouregistry.models.response;
 import com.algomart.kibouregistry.entity.DailyPayments;
+import com.algomart.kibouregistry.enums.EventType;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import java.math.BigDecimal;
@@ -11,10 +12,18 @@ public class DailyPaymentResponse {
     private Date date;
     private BigDecimal totalAmount;
     private Long event;
+    private EventType eventType;
+    private String participantName;
     public DailyPaymentResponse(DailyPayments dailyPayments) {
         this.id = dailyPayments.getDailyPaymentsId();
         this.date = dailyPayments.getDate();
         this.totalAmount = dailyPayments.getTotalAmount();
-        this.event = dailyPayments.getEvent().getEventId();
+        this.eventType = dailyPayments.getEventType();
+
+        if (dailyPayments.getParticipants() != null && !dailyPayments.getParticipants().isEmpty()) {
+            this.participantName = dailyPayments.getParticipants().get(0).getName();
+        } else {
+            this.participantName = "Unknown Participant";
+        }
     }
 }

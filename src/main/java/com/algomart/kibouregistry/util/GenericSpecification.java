@@ -20,19 +20,23 @@ public class GenericSpecification<T> implements Specification<T> {
         List<Predicate> predicates = new ArrayList<>();
 
         for (SearchCriteria criteria : criteriaList) {
-            switch (criteria.getOperation()) {
-                case EQUAL:
-                    predicates.add(criteriaBuilder.equal(root.get(criteria.getKey()), criteria.getValue()));
-                    break;
-                case GREATER_THAN:
-                    predicates.add(criteriaBuilder.greaterThan(root.get(criteria.getKey()), (Comparable) criteria.getValue()));
-                    break;
-                case LESS_THAN:
-                    predicates.add(criteriaBuilder.lessThan(root.get(criteria.getKey()), (Comparable) criteria.getValue()));
-                    break;
-                case LIKE:
-                    predicates.add(criteriaBuilder.like(root.get(criteria.getKey()), "%" + criteria.getValue() + "%"));
-                    break;
+            if (criteria.getValue() instanceof Enum) {
+                predicates.add(criteriaBuilder.equal(root.get(criteria.getKey()), criteria.getValue().toString()));
+            } else {
+                switch (criteria.getOperation()) {
+                    case EQUAL:
+                        predicates.add(criteriaBuilder.equal(root.get(criteria.getKey()), criteria.getValue()));
+                        break;
+                    case GREATER_THAN:
+                        predicates.add(criteriaBuilder.greaterThan(root.get(criteria.getKey()), (Comparable) criteria.getValue()));
+                        break;
+                    case LESS_THAN:
+                        predicates.add(criteriaBuilder.lessThan(root.get(criteria.getKey()), (Comparable) criteria.getValue()));
+                        break;
+                    case LIKE:
+                        predicates.add(criteriaBuilder.like(root.get(criteria.getKey()), "%" + criteria.getValue() + "%"));
+                        break;
+                }
             }
         }
 

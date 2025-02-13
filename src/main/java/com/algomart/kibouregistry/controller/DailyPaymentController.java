@@ -24,13 +24,19 @@ public class DailyPaymentController {
     }
 
     @GetMapping
-    
     public ResponseEntity<Page<DailyPaymentResponse>> findAll(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
             @RequestParam(required = false) EventType eventType,
             Pageable pageable) {
-        Page<DailyPaymentResponse> payments = dailyPaymentsService.findAll(startDate, endDate, eventType, pageable);
+        Page<DailyPaymentResponse> payments;
+
+        if (eventType != null) {
+            payments = dailyPaymentsService.findAll(startDate, endDate, eventType, pageable);
+        } else {
+            payments = dailyPaymentsService.findAllSortedByEventType(pageable);  // Default to sorted by eventType
+        }
+
         return ResponseEntity.ok(payments);
     }
 

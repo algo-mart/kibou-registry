@@ -6,4 +6,5 @@ import java.util.Date;
 import java.util.List;
 public interface DailyPaymentsRepo extends JpaRepository<DailyPayments, Long>, JpaSpecificationExecutor<DailyPayments> {
     List<DailyPayments> findByDateBetween(Date startDate, Date endDate);
+
 }
