@@ -39,8 +39,9 @@ public class ParticipantsController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteEvents(@PathVariable Long id) {
+    public ResponseEntity<String> deleteEvents(@PathVariable Long id) {
         participantsService.deleteParticipant(id);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok("Participant: " + id +  " deleted successfully");
     }
+
 }
