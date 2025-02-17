@@ -49,6 +49,7 @@ public class Participants {
             joinColumns = @JoinColumn(name = "participant_id"),
             inverseJoinColumns = @JoinColumn(name = "notification_id")
     )
+
     private List<Notifications> notificationList;
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -59,4 +60,9 @@ public class Participants {
     public Participants(Long participantId) {
         this.participantId = participantId;
     }
+
+    @ManyToMany(mappedBy = "participants", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
+    @JsonIgnore
+    private List<DailyPayments> dailyPayments;
+
 }
