@@ -1,10 +1,10 @@
 package com.algomart.kibouregistry.services.impl;
-import com.algomart.kibouregistry.entity.Participants;
+import com.algomart.kibouregistry.entity.User;
 import com.algomart.kibouregistry.enums.SearchOperation;
 import com.algomart.kibouregistry.enums.EventType;
 import com.algomart.kibouregistry.exceptions.DailyPaymentNotFoundException;
 import com.algomart.kibouregistry.exceptions.EventsNotFoundException;
-import com.algomart.kibouregistry.exceptions.ParticipantNotFoundException;
+import com.algomart.kibouregistry.exceptions.UserNotFoundException;
 import com.algomart.kibouregistry.models.request.DailyPaymentRequest;
 import com.algomart.kibouregistry.models.response.DailyPaymentResponse;
 import com.algomart.kibouregistry.models.SearchCriteria;
@@ -12,7 +12,7 @@ import com.algomart.kibouregistry.models.response.MonthlyPaymentSummaryResponse;
 import com.algomart.kibouregistry.repository.DailyPaymentsRepo;
 import com.algomart.kibouregistry.entity.DailyPayments;
 import com.algomart.kibouregistry.repository.EventsRepo;
-import com.algomart.kibouregistry.repository.ParticipantsRepo;
+import com.algomart.kibouregistry.repository.UserRepo;
 import com.algomart.kibouregistry.services.DailyPaymentsService;
 import com.algomart.kibouregistry.util.GenericSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,13 +28,13 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
 
     private final EventsRepo eventsRepo;
 
-    private final ParticipantsRepo participantsRepo;
+    private final UserRepo userRepo;
 
     @Autowired
-    public DailyPaymentServiceImpl(DailyPaymentsRepo dailyPaymentsRepo, EventsRepo eventsRepo, ParticipantsRepo participantsRepo) {
+    public DailyPaymentServiceImpl(DailyPaymentsRepo dailyPaymentsRepo, EventsRepo eventsRepo, UserRepo userRepo) {
         this.dailyPaymentsRepo = dailyPaymentsRepo;
         this.eventsRepo = eventsRepo;
-        this.participantsRepo = participantsRepo;
+        this.userRepo = userRepo;
     }
     public Page<DailyPaymentResponse> findAll(Date startDate, Date endDate, EventType eventType, Pageable pageable) {
         GenericSpecification<DailyPayments> spec = new GenericSpecification<>();
@@ -79,18 +79,18 @@ public class DailyPaymentServiceImpl implements DailyPaymentsService {
 
         EventType eventType = event.getEventType();
 
-        if (dailyPaymentRequest.getParticipantId() == null) {
-            throw new IllegalArgumentException("Participant ID must not be null");
+        if (dailyPaymentRequest.getUserId() == null) {
+            throw new IllegalArgumentException("User ID must not be null");
         }
 
-        Participants participant = participantsRepo.findById(dailyPaymentRequest.getParticipantId())
-                .orElseThrow(() -> new ParticipantNotFoundException(dailyPaymentRequest.getParticipantId()));
+        User users = userRepo.findById(dailyPaymentRequest.getUserId())
+                .orElseThrow(() -> new UserNotFoundException(dailyPaymentRequest.getUserId()));
 
         DailyPayments dailyPayments = new DailyPayments();
         dailyPayments.setDate(dailyPaymentRequest.getDate());
         dailyPayments.setTotalAmount(dailyPaymentRequest.getTotalAmount());
         dailyPayments.setEventType(eventType);
-        dailyPayments.setParticipants(Collections.singletonList(participant));
+        dailyPayments.setUsers(Collections.singletonList(users));
 
         DailyPayments savedPayment = dailyPaymentsRepo.save(dailyPayments);
         return new DailyPaymentResponse(savedPayment);

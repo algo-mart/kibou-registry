@@ -20,10 +20,10 @@ public class DailyPaymentResponse {
         this.totalAmount = dailyPayments.getTotalAmount();
         this.eventType = dailyPayments.getEventType();
 
-        if (dailyPayments.getParticipants() != null && !dailyPayments.getParticipants().isEmpty()) {
-            this.participantName = dailyPayments.getParticipants().get(0).getName();
+        if (dailyPayments.getUsers() != null && !dailyPayments.getUsers().isEmpty()) {
+            this.participantName = dailyPayments.getUsers().get(0).getName();
         } else {
-            this.participantName = "Unknown Participant";
+            this.participantName = "Unknown User";
         }
     }
 }

@@ -6,7 +6,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 @Data
-public class ParticipantRequest {
+public class UserRequest {
     private String name;
     private Category category;
 

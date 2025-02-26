@@ -14,8 +14,8 @@ public class DailyPaymentRequest {
     private BigDecimal totalAmount;
     private  Long event;
 
-    @NotNull(message = "Participants must not be null")
-    @NotEmpty(message = "Participants list must not be empty")
-    private Long participantId;
+    @NotNull(message = "User must not be null")
+    @NotEmpty(message = "Users list must not be empty")
+    private Long userId;
 
 }
