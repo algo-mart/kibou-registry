@@ -1,7 +1,6 @@
 package com.algomart.kibouregistry.services.impl;
 import com.algomart.kibouregistry.entity.Attendance;
 import com.algomart.kibouregistry.entity.Events;
-import com.algomart.kibouregistry.entity.Participants;
 import com.algomart.kibouregistry.enums.Category;
 import com.algomart.kibouregistry.enums.SearchOperation;
 import com.algomart.kibouregistry.exceptions.AttendanceNotFoundException;
@@ -12,7 +11,7 @@ import com.algomart.kibouregistry.models.response.APIResponse;
 import com.algomart.kibouregistry.models.response.AttendanceResponse;
 import com.algomart.kibouregistry.repository.AttendanceRepo;
 import com.algomart.kibouregistry.repository.EventsRepo;
-import com.algomart.kibouregistry.repository.ParticipantsRepo;
+import com.algomart.kibouregistry.repository.UserRepo;
 import com.algomart.kibouregistry.services.AttendanceService;
 import com.algomart.kibouregistry.util.GenericSpecification;
 import lombok.AllArgsConstructor;
@@ -31,15 +30,15 @@ public class AttendanceServiceImpl implements AttendanceService {
 
     private final AttendanceRepo attendanceRepo;
 
-    private final ParticipantsRepo participantsRepo;
+    private final UserRepo userRepo;
 
     private final EventsRepo eventsRepo;
 
     @Override
     public AttendanceResponse recordAttendance(AttendanceRequest attendance) {
         Attendance newAttendance = new Attendance();
-        var participant = participantsRepo.findById(attendance.getParticipantId()).get();
-        newAttendance.setParticipant(participant);
+        var user = userRepo.findById(attendance.getUserId()).get();
+        newAttendance.setUser(user);
         newAttendance.setDate(attendance.getDate());
         newAttendance.setStatus(attendance.getStatus());
         var event = eventsRepo.findById(attendance.getEventId()).get();
@@ -84,14 +83,14 @@ public class AttendanceServiceImpl implements AttendanceService {
 
         // Calculate total attendance per participant category (Category)
         Map<Category, Long> categoryTotals = attendanceList.stream()
-                .collect(Collectors.groupingBy(a -> a.getParticipant().getCategory(), Collectors.counting()));
+                .collect(Collectors.groupingBy(a -> a.getUser().getCategory(), Collectors.counting()));
 
         // Calculate detailed totals per meeting type per participant category
         Map<Events, Map<Category, Long>> detailedTotals = attendanceList.stream()
                 .collect(Collectors.groupingBy(
                         a -> a.getEvent(),
                         Collectors.groupingBy(
-                                a -> a.getParticipant().getCategory(),
+                                a -> a.getUser().getCategory(),
                                 Collectors.counting()
                         )
                 ));

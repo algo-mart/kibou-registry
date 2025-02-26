@@ -23,8 +23,8 @@ class GlobalExceptionHandler {
     public ResponseEntity<String> handleResourceNotFoundException(AttendanceNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
-    @ExceptionHandler(ParticipantNotFoundException.class)
-    public ResponseEntity<String> handleResourceNotFoundException(ParticipantNotFoundException ex) {
+    @ExceptionHandler(UserNotFoundException.class)
+    public ResponseEntity<String> handleResourceNotFoundException(UserNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
     }
     @ExceptionHandler(EmailAlreadyExistsException.class)

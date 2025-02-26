@@ -36,5 +36,5 @@ public class Notifications {
     private String notificationContent;
 
     @ManyToMany(mappedBy = "notificationList")
-    private List<Participants> participantsList;
+    private List<User> userList;
 }

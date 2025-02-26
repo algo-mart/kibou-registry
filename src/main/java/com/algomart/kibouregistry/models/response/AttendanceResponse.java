@@ -10,14 +10,14 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class AttendanceResponse {
     private Long attendanceId;
-    private Long participantId;
+    private Long userId;
     private LocalDate date;
     private AttendanceStatus status;
     private Long eventId;
 
     public AttendanceResponse(Attendance attendance) {
         this.attendanceId = attendance.getAttendanceId();
-        this.participantId = attendance.getParticipant().getParticipantId();
+        this.userId = attendance.getUser().getUserId();
         this.date = attendance.getDate();
         this.status = attendance.getStatus();
         this.eventId = attendance.getEvent().getEventId();

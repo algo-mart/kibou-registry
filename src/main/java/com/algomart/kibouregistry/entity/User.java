@@ -15,12 +15,12 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @AllArgsConstructor
-@Table(name = "participants")
-public class Participants {
+@Table(name = "users")
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "participant_id")
-    private Long participantId;
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "name")
     @NotBlank(message = "Name is required")
@@ -31,22 +31,26 @@ public class Participants {
     @Column(name = "category")
     private Category category;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(
-            name = "event_participants",
-            joinColumns = @JoinColumn(name = "participant_id"),
-            inverseJoinColumns = @JoinColumn(name = "event_id")
-    )
+//    @ManyToMany(cascade = CascadeType.ALL)
+//    @JoinTable(
+//            name = "event_participants",
+//            joinColumns = @JoinColumn(name = "participant_id"),
+//            inverseJoinColumns = @JoinColumn(name = "event_id")
+//    )
+//    private List<Events> events;
+
+    @ManyToMany(mappedBy = "users")
+    @JsonIgnore
     private List<Events> events;
 
-    @OneToMany(mappedBy = "participant", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonIgnore
     private List<Attendance> attendanceList;
 
     @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(
-            name = "participant_notifications",
-            joinColumns = @JoinColumn(name = "participant_id"),
+            name = "user_notifications",
+            joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "notification_id")
     )
 
@@ -57,11 +61,11 @@ public class Participants {
     @NotNull(message = "Contact information is required")
     private ContactInfo contactInfo;
 
-    public Participants(Long participantId) {
-        this.participantId = participantId;
+    public User(Long userId) {
+        this.userId = userId;
     }
 
-    @ManyToMany(mappedBy = "participants", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
+    @ManyToMany(mappedBy = "users", cascade = {CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REMOVE})
     @JsonIgnore
     private List<DailyPayments> dailyPayments;
 

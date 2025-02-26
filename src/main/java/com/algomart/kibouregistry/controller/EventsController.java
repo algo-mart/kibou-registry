@@ -38,7 +38,7 @@ public class EventsController {
         return new ResponseEntity<>(eventsService.addEvents(events),HttpStatus.CREATED);
     }
 
-    @GetMapping("/events")
+    @GetMapping("/")
     public List<Events> getAllEvents(@RequestParam(required = false) String filter,
                                      @RequestParam(required = false) String operation) {
 
@@ -53,7 +53,7 @@ public class EventsController {
 
         return eventsRepo.findAll(spec);
     }
-    @GetMapping
+    @GetMapping("/details")
     public ResponseEntity<Page<EventsResponse>> getAllParticipants(  @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date startDate,
                                                                      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) Date endDate,
                                                                      @RequestParam("searchPhrase") String venue,

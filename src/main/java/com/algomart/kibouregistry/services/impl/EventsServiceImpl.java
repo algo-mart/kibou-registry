@@ -1,5 +1,6 @@
 package com.algomart.kibouregistry.services.impl;
 import com.algomart.kibouregistry.entity.Events;
+import com.algomart.kibouregistry.entity.User;
 import com.algomart.kibouregistry.models.request.EventsRequest;
 import com.algomart.kibouregistry.enums.EventType;
 import com.algomart.kibouregistry.enums.SearchOperation;
@@ -7,6 +8,7 @@ import com.algomart.kibouregistry.exceptions.EventsNotFoundException;
 import com.algomart.kibouregistry.models.response.EventsResponse;
 import com.algomart.kibouregistry.models.SearchCriteria;
 import com.algomart.kibouregistry.repository.EventsRepo;
+import com.algomart.kibouregistry.repository.UserRepo;
 import com.algomart.kibouregistry.services.EventsService;
 import com.algomart.kibouregistry.util.GenericSpecification;
 import lombok.AllArgsConstructor;
@@ -16,30 +18,44 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.Date;
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 @Slf4j
 public class EventsServiceImpl implements EventsService {
 
     private EventsRepo eventsRepo;
+    private UserRepo userRepo;
 
     @Override
-    public EventsResponse addEvents(EventsRequest event) {
-        Events newEvents = new Events();
-        newEvents.setEventType(event.getEventType());
-        newEvents.setVenue(event.getVenue());
-        newEvents.setDate(event.getDate());
-        var saveEvents = eventsRepo.save(newEvents);
-        return new EventsResponse(saveEvents);
-    }
+    public EventsResponse addEvents(EventsRequest eventRequest) {
+        Events newEvent = new Events();
+        newEvent.setEventType(eventRequest.getEventType());
+        newEvent.setVenue(eventRequest.getVenue());
+        newEvent.setDate(eventRequest.getDate());
+        newEvent.setCategory(eventRequest.getCategory());
 
+        var savedEvent = eventsRepo.save(newEvent);
+        return new EventsResponse(
+                savedEvent.getEventId(),
+                savedEvent.getDate(),
+                savedEvent.getEventType(),
+                savedEvent.getVenue(),
+                savedEvent.getCategory(),
+                List.of() // No users initially
+        );   }
 
     @Override
     public EventsResponse getEventsById(Long id) {
         Events events = eventsRepo.findById(id)
                 .orElseThrow(() -> new EventsNotFoundException(id));
-        return new EventsResponse(events);
+
+        List<User> users = events.getUsers();
+
+        return new EventsResponse(events, users);
     }
+
 
     @Override
     public EventsResponse updateEvents(Long id, EventsRequest eventsRequest) {
@@ -50,7 +66,9 @@ public class EventsServiceImpl implements EventsService {
         events.setVenue(eventsRequest.getVenue());
 
         var newEvents = eventsRepo.save(events);
-        return new EventsResponse(newEvents);
+        List<User> users = newEvents.getUsers();
+
+        return new EventsResponse(newEvents, users);
     }
 
     @Override
@@ -79,7 +97,10 @@ public class EventsServiceImpl implements EventsService {
             }
         }
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
-        return eventsRepo.findAll(spec, pageable).map(EventsResponse::new);
+        return eventsRepo.findAll(spec, pageable).map(event -> {
+            List<User> users = userRepo.findByCategory(event.getCategory());
+            return new EventsResponse(event, users);
+        });
     }
 
 }

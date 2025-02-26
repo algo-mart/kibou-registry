@@ -7,7 +7,7 @@ This document outlines the development plan for a Minimum Viable Product (MVP) f
 ## User Stories
 
 ### New Participant Entry
-- **As an admin, I want to add a new participant record** to keep the database updated with all participants' information.
+- **As an admin, I want to add a new participant record** to keep the database updated with all user' information.
   - Acceptance Criteria:
     - Form to enter participant details.
     - Data validation and confirmation of addition.
@@ -15,11 +15,11 @@ This document outlines the development plan for a Minimum Viable Product (MVP) f
 ### Attendance Recording
 - **As an admin, I want to record attendance for each meeting day** to track participant presence.
   - Acceptance Criteria:
-    - List of participants with attendance marking.
+    - List of user with attendance marking.
     - Attendance data saved with date and ID.
 
 ### Daily Payments Management
-- **As an admin, I want to enter the total amount paid to participants every meeting day** for accurate financial records.
+- **As an admin, I want to enter the total amount paid to user every meeting day** for accurate financial records.
   - Acceptance Criteria:
     - Form to enter total daily payments.
     - Validation and confirmation of recorded payments.
@@ -51,9 +51,9 @@ To view the Entity-Relationship Diagram for the NGO Participant Management Syste
 The ERD for the NGO Participant Management System includes four primary entities:
 
 1. **Participants**: Stores details about each participant including ID, name, category, and contact information.
-2. **Attendance**: Tracks the attendance status of participants for each meeting day.
-3. **Daily Payments**: Records the total amount paid out on each meeting day, without linking to individual participants.
-4. **Notifications**: Manages the sending of notifications (email/SMS) to participants regarding their attendance.
+2. **Attendance**: Tracks the attendance status of user for each meeting day.
+3. **Daily Payments**: Records the total amount paid out on each meeting day, without linking to individual user.
+4. **Notifications**: Manages the sending of notifications (email/SMS) to user regarding their attendance.
 
 Relationships:
 - **Participants** have a one-to-many relationship with **Attendance** and **Notifications**.
@@ -63,7 +63,7 @@ Relationships:
 
 ### Admin Dashboard
 - Central hub for accessing all features.
-- Quick links to add participants, record attendance, enter daily payments, and view monthly summaries.
+- Quick links to add user, record attendance, enter daily payments, and view monthly summaries.
 
 ### Participant Entry Form
 - For entering new participant details.
@@ -71,7 +71,7 @@ Relationships:
 - Link back to the Admin Dashboard upon submission.
 
 ### Attendance Recording Page
-- Displays list of participants with checkboxes for attendance marking.
+- Displays list of user with checkboxes for attendance marking.
 - Submission leads to the recording of attendance data.
 - Option to navigate back to the Admin Dashboard.
 

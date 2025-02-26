@@ -38,7 +38,7 @@ public class DailyPayments {
     @JoinTable(
             name = "daily_payments_participants",
             joinColumns = @JoinColumn(name = "payment_id"),
-            inverseJoinColumns = @JoinColumn(name = "participant_id")
+            inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<Participants> participants;
+    private List<User> users;
 }

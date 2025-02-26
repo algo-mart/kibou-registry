@@ -1,6 +1,6 @@
 # Backend Project for Admin Interface (Java)
 
-This project is the Java-based backend component of the Admin Interface, which provides RESTful API endpoints for managing participants, recording attendance, processing daily payments, and generating summary reports.
+This project is the Java-based backend component of the Admin Interface, which provides RESTful API endpoints for managing user, recording attendance, processing daily payments, and generating summary reports.
 
 ## Getting Started
 
@@ -49,11 +49,11 @@ The server will start running on `http://localhost:8080`.
 
 ### Participants
 
-- `POST /api/participants`: Create a new participant
-- `GET /api/participants`: Retrieve all participants
-- `GET /api/participants/{id}`: Retrieve a specific participant
-- `PUT /api/participants/{id}`: Update a specific participant
-- `DELETE /api/participants/{id}`: Delete a specific participant
+- `POST /api/user`: Create a new participant
+- `GET /api/user`: Retrieve all user
+- `GET /api/user/{id}`: Retrieve a specific participant
+- `PUT /api/user/{id}`: Update a specific participant
+- `DELETE /api/user/{id}`: Delete a specific participant
 
 ### Attendance
 
