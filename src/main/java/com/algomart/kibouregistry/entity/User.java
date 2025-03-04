@@ -31,15 +31,7 @@ public class User {
     @Column(name = "category")
     private Category category;
 
-//    @ManyToMany(cascade = CascadeType.ALL)
-//    @JoinTable(
-//            name = "event_participants",
-//            joinColumns = @JoinColumn(name = "participant_id"),
-//            inverseJoinColumns = @JoinColumn(name = "event_id")
-//    )
-//    private List<Events> events;
-
-    @ManyToMany(mappedBy = "users")
+    @ManyToMany(mappedBy = "users", cascade = CascadeType.REMOVE)
     @JsonIgnore
     private List<Events> events;
 
