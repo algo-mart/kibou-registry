@@ -64,6 +64,7 @@ public class EventsServiceImpl implements EventsService {
         events.setEventType(eventsRequest.getEventType());
         events.setDate(eventsRequest.getDate());
         events.setVenue(eventsRequest.getVenue());
+        events.setCategory(eventsRequest.getCategory());
 
         var newEvents = eventsRepo.save(events);
         List<User> users = newEvents.getUsers();
