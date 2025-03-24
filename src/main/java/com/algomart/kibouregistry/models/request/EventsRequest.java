@@ -13,5 +13,5 @@ public class EventsRequest {
     private EventType eventType;
     private String venue;
     private Category category;
-    }
+}
 

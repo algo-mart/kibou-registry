@@ -7,6 +7,7 @@ import com.algomart.kibouregistry.enums.SearchOperation;
 import com.algomart.kibouregistry.exceptions.EventsNotFoundException;
 import com.algomart.kibouregistry.models.response.EventsResponse;
 import com.algomart.kibouregistry.models.SearchCriteria;
+import com.algomart.kibouregistry.models.response.UserResponse;
 import com.algomart.kibouregistry.repository.EventsRepo;
 import com.algomart.kibouregistry.repository.UserRepo;
 import com.algomart.kibouregistry.services.EventsService;
@@ -36,25 +37,31 @@ public class EventsServiceImpl implements EventsService {
         newEvent.setDate(eventRequest.getDate());
         newEvent.setCategory(eventRequest.getCategory());
 
+        List<User> users = userRepo.findByCategory(eventRequest.getCategory());
+        newEvent.setUsers(users);
+
         var savedEvent = eventsRepo.save(newEvent);
+
+        List<UserResponse> userResponses = users.stream()
+                .map(UserResponse::new)
+                .toList();
         return new EventsResponse(
                 savedEvent.getEventId(),
                 savedEvent.getDate(),
                 savedEvent.getEventType(),
                 savedEvent.getVenue(),
                 savedEvent.getCategory(),
-                List.of() // No users initially
+                userResponses
         );   }
 
-    @Override
+
     public EventsResponse getEventsById(Long id) {
-        Events events = eventsRepo.findById(id)
+        Events events = eventsRepo.findByIdWithUsers(id)
                 .orElseThrow(() -> new EventsNotFoundException(id));
 
-        List<User> users = events.getUsers();
-
-        return new EventsResponse(events, users);
+        return new EventsResponse(events, events.getUsers());
     }
+
 
 
     @Override
