@@ -4,14 +4,13 @@ import com.algomart.kibouregistry.models.request.ParticipantRequest;
 import com.algomart.kibouregistry.models.response.ParticipantResponse;
 import com.algomart.kibouregistry.services.ParticipantsService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/participants")
 public class ParticipantsController {
     private final ParticipantsService participantsService;
@@ -37,10 +36,14 @@ public class ParticipantsController {
             participantRequest){
         return new ResponseEntity<>(participantsService.updateParticipant(id,participantRequest),HttpStatus.OK);
     }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteEvents(@PathVariable Long id) {
         participantsService.deleteParticipant(id);
         return ResponseEntity.ok().build();
+    }
+    @GetMapping("/total")
+    public ResponseEntity<Long> getTotalParticipants() {
+        long total = participantsService.getTotalParticipants();
+        return ResponseEntity.ok(total);
     }
 }

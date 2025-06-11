@@ -12,4 +12,6 @@ public interface AttendanceRepo extends JpaRepository<Attendance, Long> , JpaSpe
    @Query("SELECT a FROM Attendance a WHERE MONTH(a.date) = MONTH(:startDate) AND YEAR(a.date) = YEAR(:startDate) AND DAY(a.date) <= DAY(:endDate)")
     List<Attendance> findByDateBetween(@Param("startDate") LocalDate startDate, @Param("endDate") LocalDate endDate);
 
+    @Query("SELECT COUNT(DISTINCT a.participant) FROM Attendance a WHERE a.date BETWEEN :start AND :end")
+    long countDistinctParticipantsBetween(@Param("start") LocalDate start, @Param("end") LocalDate end);
 }

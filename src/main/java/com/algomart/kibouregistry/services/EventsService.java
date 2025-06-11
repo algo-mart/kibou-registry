@@ -10,5 +10,6 @@ public interface EventsService {
     EventsResponse updateEvents(Long id, EventsRequest eventsRequest);
     void deleteEventsById(Long id);
      Page<EventsResponse> getAllEvents(Date startDate, Date endDate, String venue, int pageSize, int pageNumber, EventType eventType);
+    Long getTotalEvents();
 }
 

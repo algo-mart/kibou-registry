@@ -4,7 +4,7 @@ import com.algomart.kibouregistry.models.response.EventsResponse;
 import com.algomart.kibouregistry.enums.EventType;
 import com.algomart.kibouregistry.services.EventsService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
@@ -12,16 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/events")
 public class EventsController {
-
-
-    private EventsService eventsService;
-    @Autowired
-    public EventsController(EventsService eventsService) {
-        this.eventsService = eventsService;
-    }
-
+    private final EventsService eventsService;
     @PostMapping
     public ResponseEntity<EventsResponse> addEvents(@Valid @RequestBody EventsRequest events) {
         return new ResponseEntity<>(eventsService.addEvents(events),HttpStatus.CREATED);
@@ -33,10 +27,9 @@ public class EventsController {
             @RequestParam(defaultValue = "10") int pageSize,
             @RequestParam(defaultValue = "0") int pageNumber, @RequestParam(defaultValue = "REGULAR") EventType eventType) {
 
-        Page<EventsResponse> events = eventsService.getAllEvents(startDate,endDate,venue,pageSize,pageNumber,eventType);
-        return new ResponseEntity<>(events,HttpStatus.OK);
+        Page<EventsResponse> events = eventsService.getAllEvents(startDate, endDate, venue, pageSize, pageNumber, eventType);
+        return new ResponseEntity<>(events, HttpStatus.OK);
     }
-
     @GetMapping("/{id}")
     public ResponseEntity<EventsResponse> findEventsById(@PathVariable Long id){
         return new ResponseEntity<>(eventsService.getEventsById(id),HttpStatus.OK);
@@ -51,5 +44,10 @@ public class EventsController {
     public ResponseEntity<Void> deleteEvents(@PathVariable Long id){
         eventsService.deleteEventsById(id);
         return ResponseEntity.ok().build();
+    }
+    @GetMapping("/total")
+    public ResponseEntity<Long> getTotalEvents() {
+        long total = eventsService.getTotalEvents();
+        return ResponseEntity.ok(total);
     }
 }

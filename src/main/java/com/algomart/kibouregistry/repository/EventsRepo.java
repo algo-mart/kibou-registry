@@ -5,6 +5,4 @@ import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 @Repository
 public interface EventsRepo extends JpaRepository<Events, Long> , JpaSpecificationExecutor<Events> {
-
-
 }

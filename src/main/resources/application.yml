@@ -3,6 +3,14 @@ spring:
     url: ${JDBC_DATABASE_URL}
     username: ${JDBC_DATABASE_USERNAME}
     password: ${JDBC_DATABASE_PASSWORD}
+  cache:
+    type: redis
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+
 
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
@@ -12,6 +20,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
 
 server:
   port: ${PORT:9000}

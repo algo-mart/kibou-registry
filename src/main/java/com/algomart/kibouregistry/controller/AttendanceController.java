@@ -4,13 +4,14 @@ import com.algomart.kibouregistry.models.response.APIResponse;
 import com.algomart.kibouregistry.models.response.AttendanceResponse;
 import com.algomart.kibouregistry.services.AttendanceService;
 import jakarta.validation.Valid;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import java.time.YearMonth;
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/attendance")
 public class AttendanceController {
     private final AttendanceService attendanceService;
@@ -35,10 +36,16 @@ public class AttendanceController {
         attendanceService.deleteAttendance(id);
         return ResponseEntity.ok().build();
     }
-
     @GetMapping("/monthly-summary")
     public ResponseEntity<APIResponse> getMonthlySummary(@Valid @RequestParam int month, @RequestParam int year) {
         APIResponse response = attendanceService.getMonthlySummary(month, year);
         return ResponseEntity.ok(response);
+    }
+    @GetMapping("/monthly-active")
+    public ResponseEntity<Long> getMonthlyActiveUsers(
+            @RequestParam int year,
+            @RequestParam int month) {
+        YearMonth yearMonth = YearMonth.of(year, month);
+        return ResponseEntity.ok(attendanceService.getMonthlyActiveUsers(yearMonth));
     }
 }

@@ -5,18 +5,17 @@ import com.algomart.kibouregistry.models.response.DailyPaymentResponse;
 import com.algomart.kibouregistry.models.response.MonthlyPaymentSummaryResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import java.math.BigDecimal;
 import java.util.Date;
 public interface DailyPaymentsService {
     Page<DailyPaymentResponse> findAll(Date startDate, Date endDate, EventType eventType, Pageable pageable);
-
     DailyPaymentResponse findById(Long theId);
     void deleteById(Long theId);
-
     DailyPaymentResponse save(DailyPaymentRequest theDailyPayments);
-
     DailyPaymentResponse update(Long id, DailyPaymentRequest theDailyPayment);
-
     MonthlyPaymentSummaryResponse getMonthlyPaymentSummary(int month, int year);
+    BigDecimal getTotalPayments();
+    BigDecimal getAveragePaymentPerUser();
 }
 
 

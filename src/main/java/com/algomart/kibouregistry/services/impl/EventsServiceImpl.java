@@ -9,20 +9,17 @@ import com.algomart.kibouregistry.models.SearchCriteria;
 import com.algomart.kibouregistry.repository.EventsRepo;
 import com.algomart.kibouregistry.services.EventsService;
 import com.algomart.kibouregistry.util.GenericSpecification;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.util.Date;
 @Service
-@AllArgsConstructor
-@Slf4j
+@RequiredArgsConstructor
 public class EventsServiceImpl implements EventsService {
-
-    private EventsRepo eventsRepo;
-
+    private final EventsRepo eventsRepo;
     @Override
     public EventsResponse addEvents(EventsRequest event) {
         Events newEvents = new Events();
@@ -32,15 +29,12 @@ public class EventsServiceImpl implements EventsService {
         var saveEvents = eventsRepo.save(newEvents);
         return new EventsResponse(saveEvents);
     }
-
-
     @Override
     public EventsResponse getEventsById(Long id) {
         Events events = eventsRepo.findById(id)
                 .orElseThrow(() -> new EventsNotFoundException(id));
         return new EventsResponse(events);
     }
-
     @Override
     public EventsResponse updateEvents(Long id, EventsRequest eventsRequest) {
         Events events = eventsRepo.findById(id).
@@ -48,7 +42,6 @@ public class EventsServiceImpl implements EventsService {
         events.setEventType(eventsRequest.getEventType());
         events.setDate(eventsRequest.getDate());
         events.setVenue(eventsRequest.getVenue());
-
         var newEvents = eventsRepo.save(events);
         return new EventsResponse(newEvents);
     }
@@ -61,8 +54,7 @@ public class EventsServiceImpl implements EventsService {
     }
 
     @Override
-    public Page<EventsResponse> getAllEvents(Date startDate, Date endDate,
-                                             String venue, int pageSize, int pageNumber, EventType eventType) {
+    public Page<EventsResponse> getAllEvents(Date startDate, Date endDate, String venue, int pageSize, int pageNumber, EventType eventType) {
         GenericSpecification<Events> spec = new GenericSpecification<>();
         if (eventType != null) {
             if (startDate != null) {
@@ -71,9 +63,7 @@ public class EventsServiceImpl implements EventsService {
             if (endDate != null) {
                 spec.add(new SearchCriteria("date", endDate, SearchOperation.LESS_THAN));
             }
-            if (eventType != null) {
-                spec.add(new SearchCriteria("eventType", eventType, SearchOperation.EQUAL));
-            }
+            spec.add(new SearchCriteria("eventType", eventType, SearchOperation.EQUAL));
             if (venue != null) {
                 spec.add(new SearchCriteria("venue", venue, SearchOperation.LIKE));
             }
@@ -81,7 +71,11 @@ public class EventsServiceImpl implements EventsService {
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return eventsRepo.findAll(spec, pageable).map(EventsResponse::new);
     }
-
+    @Override
+    @Cacheable("totalEvents")
+    public Long getTotalEvents() {
+        return eventsRepo.count();
+    }
 }
 
 

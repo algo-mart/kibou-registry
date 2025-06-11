@@ -6,32 +6,27 @@ import com.algomart.kibouregistry.exceptions.*;
 import com.algomart.kibouregistry.models.SearchCriteria;
 import com.algomart.kibouregistry.models.request.ParticipantRequest;
 import com.algomart.kibouregistry.models.response.ParticipantResponse;
-import com.algomart.kibouregistry.repository.EventsRepo;
 import com.algomart.kibouregistry.repository.ParticipantsRepo;
 import com.algomart.kibouregistry.services.ParticipantsService;
 import com.algomart.kibouregistry.util.GenericSpecification;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import java.util.List;
-import java.util.stream.Collectors;
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ParticipantsServiceImpl implements ParticipantsService {
 
     private final ParticipantsRepo participantsRepo;
-    private final EventsRepo eventsRepo;
     @Override
     public ParticipantResponse addParticipant(ParticipantRequest participant) {
         String email = participant.getContactInfo().getEmail();
         Participants existingParticipant = participantsRepo.findByContactInfoEmail(email);
-
         if (existingParticipant != null) {
             throw new EmailAlreadyExistsException();
         }
-
         Participants newParticipant = new Participants();
         newParticipant.setName(participant.getName());
         newParticipant.setCategory(participant.getCategory());
@@ -45,9 +40,14 @@ public class ParticipantsServiceImpl implements ParticipantsService {
         if (category != null) {
             spec.add(new SearchCriteria("category", category, SearchOperation.EQUAL));
         }
-
         Pageable pageable = PageRequest.of(pageNumber, pageSize);
         return participantsRepo.findAll(spec, pageable).map(ParticipantResponse::new);
+    }
+
+    @Override
+    @Cacheable("totalParticipants")
+    public Long getTotalParticipants() {
+        return participantsRepo.count();
     }
     @Override
     public ParticipantResponse getParticipantById(Long id) {
@@ -62,12 +62,9 @@ public class ParticipantsServiceImpl implements ParticipantsService {
         participant1.setName(participantRequest.getName());
         participant1.setCategory(participantRequest.getCategory());
         participant1.setContactInfo(participantRequest.getContactInfo());
-
         var newParticipant = participantsRepo.save(participant1);
         return new ParticipantResponse(newParticipant);
     }
-
-    @Override
     public void deleteParticipant(Long id) {
         participantsRepo.findById(id).orElseThrow(() ->
                 new ParticipantNotFoundException(id));
